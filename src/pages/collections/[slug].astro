@@ -1,0 +1,41 @@
+---
+// src/pages/collections/[slug].astro — one curated collection of remote HR jobs.
+import Base from "../../layouts/Base.astro";
+import JobBoard from "../../components/JobBoard.astro";
+import { getJobs } from "../../lib/airtable.mjs";
+import { buildCollections } from "../../lib/collections.mjs";
+import { breadcrumbSchema } from "../../lib/schema.mjs";
+
+export async function getStaticPaths() {
+  const open = (await getJobs()).filter((j) => !j.closed);
+  return buildCollections(open).map((c) => ({ params: { slug: c.slug }, props: { col: c } }));
+}
+
+const { col } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const url = `${site}/collections/${col.slug}`;
+const intro = `${col.blurb} ${col.count} ${col.count === 1 ? "role is" : "roles are"} open right now, updated daily.`;
+
+const itemList = {
+  "@context": "https://schema.org", "@type": "ItemList", name: col.title,
+  numberOfItems: col.count,
+  itemListElement: col.jobs.map((j, i) => ({ "@type": "ListItem", position: i + 1, url: `${site}/jobs/${j.slug}`, name: j.title })),
+};
+const crumbs = [
+  { name: "Home", url: `${site}/` },
+  { name: "Collections", url: `${site}/collections` },
+  { name: col.title, url },
+];
+---
+<Base title={`${col.title} (${col.count} open) | HRJobsRemote`} description={intro.slice(0, 158)} canonical={url} schemas={[itemList, breadcrumbSchema(crumbs)]} wide={true}>
+  <span class="eyebrow">Collection</span>
+  <h1>{col.title}</h1>
+  <p class="answer">{intro}</p>
+
+  <JobBoard jobs={col.jobs} showCategoryFilter={true} />
+
+  <nav class="related-links" aria-label="More collections">
+    <h2>More collections</h2>
+    <ul><li><a href="/collections">Browse all remote HR job collections →</a></li></ul>
+  </nav>
+</Base>

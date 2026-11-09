@@ -1,0 +1,61 @@
+---
+// src/pages/blog/[slug].astro — SEO + GEO optimized article page.
+import Base from "../../layouts/Base.astro";
+import { getArticles } from "../../lib/airtable.mjs";
+import { blogPostingSchema, breadcrumbSchema, faqSchema } from "../../lib/schema.mjs";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+  const articles = await getArticles();
+  return articles.map((article) => ({ params: { slug: article.slug }, props: { article } }));
+}
+
+const { article } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const url = `${site}/blog/${article.slug}`;
+const bodyHtml = marked.parse(article.body || "");
+
+const title = `${article.title} | HRJobsRemote`;
+const metaDesc = (article.summary || article.title).slice(0, 158);
+
+const crumbs = [
+  { name: "Home", url: `${site}/` },
+  { name: "Blog", url: `${site}/blog` },
+  { name: article.title, url },
+];
+
+const schemas = [
+  blogPostingSchema(article, url),
+  breadcrumbSchema(crumbs),
+  faqSchema(article.faq),
+];
+
+const fmt = (d) => (d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "");
+---
+<Base title={title} description={metaDesc} canonical={url} image={article.image} schemas={schemas} ogType="article">
+  {article.category && <p class="eyebrow">{article.category}</p>}
+  <h1>{article.title}</h1>
+
+  <!-- Visible publish/update dates — a freshness and trust signal -->
+  <p class="byline">
+    {article.datePublished && <>Published {fmt(article.datePublished)}</>}
+    {article.dateModified && article.dateModified !== article.datePublished && <> · Updated {fmt(article.dateModified)}</>}
+  </p>
+
+  <!-- TL;DR / answer capsule: AI extracts from the top, so the conclusion goes first -->
+  {article.summary && <p class="answer"><strong>In short:</strong> {article.summary}</p>}
+
+  <article class="prose" set:html={bodyHtml} />
+
+  {article.faq && article.faq.length > 0 && (
+    <section class="faq" aria-label="Frequently asked questions">
+      <h2>Frequently asked questions</h2>
+      {article.faq.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </section>
+  )}
+</Base>

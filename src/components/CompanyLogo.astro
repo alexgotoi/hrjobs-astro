@@ -1,0 +1,45 @@
+---
+/**
+ * CompanyLogo.astro — the company logo shown on job cards, job pages and company pages.
+ *
+ * Behaviour (handles every case cleanly):
+ *   • Real logo present  → shown with object-fit:contain on white, so the WHOLE logo
+ *     fits the square regardless of its shape (wordmarks aren't cropped).
+ *   • No logo            → a colored monogram (company initial) — the industry-standard
+ *     fallback (Gmail/Slack/LinkedIn style). Color is derived from the company name,
+ *     so it's stable per company.
+ *   • Broken logo URL    → the <img> removes itself on error (onerror), revealing the
+ *     monogram underneath. Feed logo URLs 404 fairly often, so this matters.
+ *
+ * The monogram sits underneath and the <img> layers on top of it, which is what makes
+ * the error-fallback work with zero JavaScript framework.
+ *
+ * Props:
+ *   company : string  — employer name (first letter → monogram; name → color).
+ *   logo    : string  — logo URL ("" / falsy → monogram only).
+ *   size    : number  — box size in px (48 on cards, 64 on page headers). Default 48.
+ */
+const { company = "", logo = "", size = 48 } = Astro.props;
+
+// Deterministic color bucket from the company name (mono-0..4 in global.css).
+const monoClass = (s) => {
+  let h = 0;
+  for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return `mono-${h % 5}`;
+};
+const initial = (company || "?").charAt(0).toUpperCase();
+---
+<span class={`logo-box ${monoClass(company)}`} style={`--logo-size:${size}px`}>
+  <span class="logo-initial" aria-hidden="true">{initial}</span>
+  {logo && (
+    <img
+      class="logo-img"
+      src={logo}
+      alt={`${company} logo`}
+      loading="lazy"
+      width={size}
+      height={size}
+      onerror="this.remove()"
+    />
+  )}
+</span>

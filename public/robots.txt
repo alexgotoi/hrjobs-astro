@@ -1,0 +1,78 @@
+# robots.txt — HRJobsRemote
+# Strategy: open the whole site to traditional search engines AND to AI answer
+# engines. For a job board, being crawlable by AI assistants (ChatGPT, Perplexity,
+# Claude, Gemini, etc.) is how we get recommended when people ask them for HR jobs.
+# ChatGPT also draws on the Bing index, so Bingbot matters as much as Googlebot.
+
+# --- Traditional search engines ---
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# --- AI training + answer-engine crawlers (GEO) ---
+# Blocking any of these makes the site invisible in that assistant's answers.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+# --- Everyone else ---
+User-agent: *
+Allow: /
+
+# Machine-readable guides for crawlers and LLMs
+Sitemap: https://www.hrjobsremote.com/sitemap.xml

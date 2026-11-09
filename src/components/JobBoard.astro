@@ -1,0 +1,232 @@
+---
+import CompanyLogo from "./CompanyLogo.astro";
+// src/components/JobBoard.astro — Remotive-style listing with client-side
+// filtering (search + category pills + fully-remote toggle + type/level/region
+// dropdowns) and a live job count. Each card links to its dedicated /jobs/[slug]
+// page and has its own "Apply now" button.
+// Props let it also render as a bare list (for "more jobs" sections):
+//   showSearch, showControls, showCategoryFilter, showCount (all default true).
+// On the homepage it also reads initial filters from the URL (?q=&type=&level=&region=&remote=1),
+// so the search bar on the job detail page can hand off a search here.
+const {
+  jobs,
+  showSearch = true,
+  showControls = true,
+  showCategoryFilter = true,
+  showCount = true,
+  showFeatureCta = true,   // the "feature your job for $99" promo strip
+  placeholders = [],       // example featured cards shown only until a real one exists
+} = Astro.props;
+
+// TODO: point this at your Airtable "Feature a job" form (the paid-placement form).
+// Until payment is wired, this can be the same Add-a-job form with a "Featured?" field,
+// or a Stripe/Gumroad payment link that then emails you the job details. See the note
+// I sent on payment options.
+const FEATURE_JOB_FORM = "https://airtable.com/REPLACE_WITH_YOUR_FEATURE_FORM";
+
+
+const empLabel = { FULL_TIME: "Full-time", PART_TIME: "Part-time", CONTRACTOR: "Contract", INTERN: "Internship" };
+const regionLabel = { "United States": "US", "United Kingdom": "UK" };
+
+const locTag = (j) => {
+  if (j.remoteType === "Fully Remote") return `Remote${j.remoteRegion ? ` · ${j.remoteRegion}` : ""}`;
+  if (j.remoteType === "Hybrid" || j.remoteType === "Partially Remote")
+    return `${j.remoteType}${(j.city || j.state) ? ` · ${[j.city, j.state].filter(Boolean).join(", ")}` : ""}`;
+  if (j.remoteType === "Potentially Remote") return "Potentially remote";
+  return [j.city, j.state].filter(Boolean).join(", ") || "On-site";
+};
+
+
+const relDate = (d) => {
+  if (!d) return "";
+  const days = Math.floor((Date.now() - new Date(d)) / 86400000);
+  if (days <= 2) return "New";
+  if (days < 7) return `${days}d ago`;
+  if (days < 28) return `${Math.floor(days / 7)}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+};
+
+const counts = {};
+for (const j of jobs) if (j.hrCategory) counts[j.hrCategory] = (counts[j.hrCategory] || 0) + 1;
+const cats = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+const empOpts = [...new Set(jobs.map((j) => j.employmentType).filter(Boolean))];
+const levelOpts = [...new Set(jobs.map((j) => j.careerLevel).filter(Boolean))].sort();
+const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))].sort();
+---
+<div class="board" data-board>
+  {showSearch && (
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" class="js-search" placeholder="Search by job title or company…" aria-label="Search jobs" />
+    </div>
+  )}
+
+  {showCategoryFilter && (
+    <div class="filters">
+      <button class="pill active" data-cat="" aria-pressed="true">All<span class="c">{jobs.length}</span></button>
+      {cats.map((c) => (
+        <button class="pill" data-cat={c} aria-pressed="false">{c}<span class="c">{counts[c]}</span></button>
+      ))}
+    </div>
+  )}
+
+  {showControls && (
+    <div class="controls">
+      <label class="remote-toggle"><input type="checkbox" class="js-remote-only" /> Fully remote only</label>
+      <select class="filter-select js-emp" aria-label="Filter by employment type">
+        <option value="">All types</option>
+        {empOpts.map((e) => <option value={e}>{empLabel[e] || e}</option>)}
+      </select>
+      <select class="filter-select js-level" aria-label="Filter by level">
+        <option value="">All levels</option>
+        {levelOpts.map((l) => <option value={l}>{l}</option>)}
+      </select>
+      <select class="filter-select js-region" aria-label="Filter by region">
+        <option value="">All regions</option>
+        {regionOpts.map((r) => <option value={r}>{regionLabel[r] || r}</option>)}
+      </select>
+    </div>
+  )}
+
+  {showCount && (
+    <div class="board-head">
+      <span class="showing"><b class="js-count">{jobs.length}</b> {jobs.length === 1 ? "job" : "jobs"}</span>
+    </div>
+  )}
+
+  {showFeatureCta && (
+    <a class="feature-cta" href={FEATURE_JOB_FORM} target="_blank" rel="noopener">
+      <span class="feature-cta-text">
+        <b>Want your role seen first?</b> Feature your job at the top of the board <b>and in our weekly newsletter to 16,000+ HR professionals</b>.
+      </span>
+      <span class="feature-cta-price">$99 · 30 days →</span>
+    </a>
+  )}
+
+  {placeholders.length > 0 && (
+    <ul class="jb-list jb-placeholder-list" aria-label="Example featured listings">
+      {placeholders.map((j) => (
+        <li class="jb-row featured jb-placeholder">
+          <CompanyLogo company={j.company} logo={null} size={48} />
+          <div class="jb-main">
+            <span class="jb-eg">Example listing — this is what a featured job looks like</span>
+            <p class="jb-title"><a class="jb-link" href={FEATURE_JOB_FORM} target="_blank" rel="noopener">{j.title}</a></p>
+            <p class="jb-company">{j.company}</p>
+            <div class="jb-tags">
+              <span class="tag feat">★ Featured</span>
+              <span class="tag">Top of the board</span>
+              <span class="tag">Newsletter · 16,000+ HR pros</span>
+            </div>
+          </div>
+          <div class="jb-meta">
+            <span class="jb-date">Example slot</span>
+            <a class="jb-apply" href={FEATURE_JOB_FORM} target="_blank" rel="noopener">Feature your job →</a>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <ul class="jb-list">
+    {jobs.map((j) => {
+      const emp = empLabel[j.employmentType] || "Full-time";
+      const rel = relDate(j.datePosted);
+      return (
+        <li class={`jb-row${j.featured ? " featured" : ""}`}
+            data-job
+            data-featured={String(!!j.featured)}
+            data-fully={String(j.remoteType === "Fully Remote")}
+            data-category={j.hrCategory || ""}
+            data-emp={j.employmentType || ""}
+            data-level={j.careerLevel || ""}
+            data-region={j.remoteRegion || ""}
+            data-text={`${j.title} ${j.company}`.toLowerCase()}>
+          <CompanyLogo company={j.company} logo={j.companyLogo} size={48} />
+          <div class="jb-main">
+            {/* Clicking the tile anywhere (this link fills the card via .jb-link::after)
+                goes to the employer's destination URL from Airtable. Falls back to the
+                on-site detail page if a job has no apply URL. The "Apply now" button below
+                sits above this overlay and goes to the on-site detail page instead. */}
+            <p class="jb-title"><a class="jb-link"
+              href={j.applyUrl || `/jobs/${j.slug}`}
+              target={j.applyUrl ? "_blank" : undefined}
+              rel={j.applyUrl ? "nofollow noopener" : undefined}>{j.title}</a></p>
+            <p class="jb-company">{j.company}</p>
+            <div class="jb-tags">
+              {j.featured && <span class="tag feat">★ Featured</span>}
+              {j.hrCategory && <span class="tag">{j.hrCategory}</span>}
+              <span class="tag">{emp}</span>
+              {j.careerLevel && j.careerLevel !== "Individual Contributor" && <span class="tag">{j.careerLevel}</span>}
+              <span class="tag remote">{locTag(j)}</span>
+            </div>
+          </div>
+          <div class="jb-meta">
+            <span class="jb-date">{rel === "New" ? <span class="badge-new">New</span> : rel}</span>
+            {/* The button goes to the on-site detail page (so those pages get the traffic). */}
+            <a class="jb-apply" href={`/jobs/${j.slug}`}>View details</a>
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+  <p class="jb-empty" hidden>No jobs match your filters.</p>
+</div>
+
+<script>
+  document.querySelectorAll("[data-board]").forEach((board) => {
+    const search = board.querySelector(".js-search");
+    const remoteOnly = board.querySelector(".js-remote-only");
+    const empSel = board.querySelector(".js-emp");
+    const levelSel = board.querySelector(".js-level");
+    const regionSel = board.querySelector(".js-region");
+    const pills = board.querySelectorAll(".pill");
+    const rows = [...board.querySelectorAll("[data-job]")];
+    const countEl = board.querySelector(".js-count");
+    const empty = board.querySelector(".jb-empty");
+    let activeCat = "";
+
+    const apply = () => {
+      const q = (search?.value || "").trim().toLowerCase();
+      const fully = remoteOnly?.checked;
+      const emp = empSel?.value || "";
+      const level = levelSel?.value || "";
+      const region = regionSel?.value || "";
+      let shown = 0;
+      rows.forEach((row) => {
+        const ok =
+          (!q || row.dataset.text.includes(q)) &&
+          (!activeCat || row.dataset.category === activeCat) &&
+          (!fully || row.dataset.fully === "true") &&
+          (!emp || row.dataset.emp === emp) &&
+          (!level || row.dataset.level === level) &&
+          (!region || row.dataset.region === region);
+        row.hidden = !ok;
+        if (ok) shown++;
+      });
+      if (countEl) countEl.textContent = shown;
+      if (empty) empty.hidden = shown !== 0;
+    };
+
+    search?.addEventListener("input", apply);
+    [remoteOnly, empSel, levelSel, regionSel].forEach((el) => el?.addEventListener("change", apply));
+    pills.forEach((p) =>
+      p.addEventListener("click", () => {
+        pills.forEach((x) => { x.classList.remove("active"); x.setAttribute("aria-pressed", "false"); });
+        p.classList.add("active");
+        p.setAttribute("aria-pressed", "true");
+        activeCat = p.dataset.cat;
+        apply();
+      })
+    );
+
+    // Initial filters handed off from the job detail page (?q=&type=&level=&region=&remote=1)
+    const params = new URLSearchParams(location.search);
+    if (search && params.get("q")) search.value = params.get("q");
+    if (empSel && params.get("type")) empSel.value = params.get("type");
+    if (levelSel && params.get("level")) levelSel.value = params.get("level");
+    if (regionSel && params.get("region")) regionSel.value = params.get("region");
+    if (remoteOnly && params.get("remote")) remoteOnly.checked = true;
+    if ([...params.keys()].length) apply();
+  });
+</script>

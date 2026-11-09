@@ -1,0 +1,42 @@
+---
+// src/pages/collections/index.astro — directory of curated job collections.
+import Base from "../../layouts/Base.astro";
+import { getJobs } from "../../lib/airtable.mjs";
+import { buildCollections } from "../../lib/collections.mjs";
+
+const open = (await getJobs()).filter((j) => !j.closed);
+const collections = buildCollections(open);
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const url = `${site}/collections`;
+
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Remote HR job collections",
+  numberOfItems: collections.length,
+  itemListElement: collections.map((c, i) => ({
+    "@type": "ListItem", position: i + 1, url: `${site}/collections/${c.slug}`, name: c.title,
+  })),
+};
+---
+<Base
+  title="Remote HR Job Collections | HRJobsRemote"
+  description="Curated collections of remote HR jobs — entry-level, leadership, work-from-anywhere, recruiting, people-ops and more."
+  canonical={url}
+  schemas={[itemList]}
+  wide={true}
+>
+  <span class="eyebrow">Resources</span>
+  <h1>Remote HR job collections</h1>
+  <p class="answer">Hand-picked groupings of remote HR jobs, so you can jump straight to the roles that fit where you are in your career.</p>
+
+  <div class="cards">
+    {collections.map((c) => (
+      <a class="card-post" href={`/collections/${c.slug}`}>
+        <span class="label">{c.count} {c.count === 1 ? "job" : "jobs"}</span>
+        <span class="t">{c.title}</span>
+        <span class="muted" style="font-size:0.95rem;line-height:1.5;">{c.blurb}</span>
+      </a>
+    ))}
+  </div>
+</Base>

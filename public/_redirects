@@ -1,0 +1,43 @@
+# ============================================================================
+# HRJobsRemote — 301 redirects: old Softr URLs → new structure.
+# Netlify reads this file from the site root. Activates once this site is
+# live on www.hrjobsremote.com (replacing Softr).
+# ============================================================================
+
+# --- Blog articles (were at root on Softr) → /blog/{slug} ---
+# NOTE: recreate each article in Airtable with the SAME slug shown below,
+# so the redirect lands on a real page.
+/highest-paying-remote-hr-jobs                              /blog/highest-paying-remote-hr-jobs                              301
+/how-to-transition-from-on-site-hr-to-remote-hr             /blog/how-to-transition-from-on-site-hr-to-remote-hr             301
+/what-global-companies-look-for-in-remote-hr-talent         /blog/what-global-companies-look-for-in-remote-hr-talent         301
+/hr-jobs-that-can-be-done-remotely-top-roles-for-remote     /blog/hr-jobs-that-can-be-done-remotely-top-roles-for-remote     301
+/best-free-online-hr-courses-in-2025                        /blog/best-free-online-hr-courses-in-2025                        301
+/how-to-find-and-land-remote-hr-jobs                        /blog/how-to-find-and-land-remote-hr-jobs                        301
+/remote-recruiter-salary                                    /blog/remote-recruiter-salary                                    301
+/the-hr-career-ladder-from-coordinator-to-remote-hr-manager /blog/the-hr-career-ladder-from-coordinator-to-remote-hr-manager 301
+/where-to-find-legit-remote-hr-jobs-beyond-linkedin         /blog/where-to-find-legit-remote-hr-jobs-beyond-linkedin         301
+
+# --- Region landing variants → new consistent pattern ---
+/remote-recruiter-jobs-uk                /remote-recruiter-jobs-in-uk   301
+/remote-recruiter-jobs-in-united-states  /remote-recruiter-jobs-in-us   301
+
+# --- Utility / deprecated pages ---
+/add-job      https://airtable.com/REPLACE_WITH_YOUR_FORM   301!
+/checkout     /   301
+/newsletter   /   301   # or point to your newsletter provider's signup URL
+/job-details      /   301   # old Softr job template
+/job-details/*    /   301   # individual jobs were /job-details?recordId=... (now ephemeral)
+
+# ============================================================================
+# DO NOT REDIRECT the 16 /remote-{role}-jobs category pages — they rank.
+# Instead, align the taxonomy so the new build regenerates these exact URLs:
+#   remote-recruiter-jobs, remote-hr-generalist-jobs, remote-hr-manager-jobs,
+#   remote-hr-business-partner-jobs, remote-learning-and-development-jobs,
+#   remote-organizational-development-jobs, remote-hr-admin-jobs,
+#   remote-hr-tech-jobs, remote-payroll-jobs, remote-compensation-and-benefits-jobs,
+#   remote-sourcer-jobs, remote-hr-operations-jobs, remote-employer-branding-jobs,
+#   remote-diversity-and-inclusion-jobs, remote-people-analytics-jobs,
+#   remote-hr-internships
+#
+# /about — create an About page (recommended) instead of redirecting.
+# ============================================================================

@@ -1,0 +1,29 @@
+---
+// src/pages/blog/index.astro
+import Base from "../../layouts/Base.astro";
+import { getArticles } from "../../lib/airtable.mjs";
+
+const articles = (await getArticles()).sort(
+  (a, b) => new Date(b.datePublished) - new Date(a.datePublished)
+);
+const fmt = (d) => (d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "");
+---
+<Base
+  title="HR Career Guides & Remote Work Advice | HRJobsRemote"
+  description="Practical guides on HR careers, remote work, salaries and hiring — written for recruiters, HRBPs and people-ops professionals."
+>
+  <span class="eyebrow">HR career guides</span>
+  <h1>Blog</h1>
+  <p class="answer">In-depth, regularly updated guides on HR careers, remote work, and compensation for HR professionals.</p>
+
+  <div class="cards">
+    {articles.map((a) => (
+      <a class="card-post" href={`/blog/${a.slug}`}>
+        {a.category && <span class="label">{a.category}</span>}
+        <span class="t">{a.title}</span>
+        {a.summary && <span class="muted" style="font-size:0.95rem;line-height:1.5;">{a.summary.slice(0, 120)}{a.summary.length > 120 ? "…" : ""}</span>}
+        <span class="d">{fmt(a.datePublished)}</span>
+      </a>
+    ))}
+  </div>
+</Base>

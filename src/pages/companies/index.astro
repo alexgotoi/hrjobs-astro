@@ -1,0 +1,43 @@
+---
+// src/pages/companies/index.astro — directory of companies hiring remote HR roles.
+import Base from "../../layouts/Base.astro";
+import { getJobs } from "../../lib/airtable.mjs";
+import { buildCompanyPages } from "../../lib/landing.mjs";
+
+const open = (await getJobs()).filter((j) => !j.closed);
+const companies = buildCompanyPages(open);
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const url = `${site}/companies`;
+
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Companies hiring remote HR professionals",
+  numberOfItems: companies.length,
+  itemListElement: companies.map((c, i) => ({
+    "@type": "ListItem", position: i + 1, url: `${site}/companies/${c.slug}`, name: c.company,
+  })),
+};
+---
+<Base
+  title={`Remote HR Companies Hiring (${companies.length}) | HRJobsRemote`}
+  description={`Browse ${companies.length} companies hiring remote HR professionals — recruiters, HRBPs, people-ops and more. See open roles at each.`}
+  canonical={url}
+  schemas={[itemList]}
+  wide={true}
+>
+  <span class="eyebrow">Companies</span>
+  <h1>Companies hiring remote HR</h1>
+  <p class="answer">{companies.length} companies are hiring remote HR professionals on HRJobsRemote right now. Browse their open roles below.</p>
+
+  <ul class="company-grid">
+    {companies.map((c) => (
+      <li>
+        <a href={`/companies/${c.slug}`}>
+          <span class="co-name">{c.company}</span>
+          <span class="co-count">{c.jobs.length} open {c.jobs.length === 1 ? "role" : "roles"}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Base>

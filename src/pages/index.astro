@@ -1,0 +1,36 @@
+---
+// src/pages/index.astro — homepage: the main remote-HR-jobs board.
+// The hero (heading + lede) is injected into the shared newsletter band via the
+// "hero" slot, so the page opens with one combined navy section, then the board.
+import Base from "../layouts/Base.astro";
+import JobBoard from "../components/JobBoard.astro";
+import Faq from "../components/Faq.astro";
+import { getJobs } from "../lib/airtable.mjs";
+import { sortJobs, FEATURED_PLACEHOLDERS } from "../lib/util.mjs";
+import { faqSchema } from "../lib/schema.mjs";
+import { homeFaq } from "../lib/faq.mjs";
+
+const jobs = sortJobs((await getJobs()).filter((j) => !j.closed));
+const faqItems = homeFaq();
+
+// Show example featured cards only until there is at least one real featured job.
+const placeholders = jobs.some((j) => j.featured) ? [] : FEATURED_PLACEHOLDERS;
+
+// Answer-first meta description (also the sentence AI engines are most likely to extract).
+const answer = `HRJobsRemote lists ${jobs.length} hand-picked remote jobs for HR professionals — recruiters, HR business partners, people-ops, L&D and more — updated daily.`;
+---
+<Base
+  title="Remote HR Jobs — Recruiter, HRBP & People Ops | HRJobsRemote"
+  description={answer.slice(0, 158)}
+  schemas={[faqSchema(faqItems)]}
+  wide={true}
+>
+  <Fragment slot="hero">
+    <h1>Remote jobs for HR professionals</h1>
+    <p class="nl-lede">Hand-picked, fully-remote-first roles for recruiters, HR business partners, people-ops, L&amp;D and many more other HR roles. No noise, no expired listings.</p>
+  </Fragment>
+
+  <JobBoard jobs={jobs} placeholders={placeholders} />
+
+  <Faq items={faqItems} heading="Remote HR jobs — FAQ" />
+</Base>

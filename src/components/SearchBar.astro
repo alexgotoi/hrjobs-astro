@@ -1,0 +1,29 @@
+---
+// src/components/SearchBar.astro — search + filters shown on the job detail page.
+// It's a GET form pointing at "/", so using it takes the visitor to the homepage
+// board with those filters pre-applied (JobBoard reads ?q=&type=&level=&region=&remote=1).
+const { options } = Astro.props; // { emp:[], level:[], region:[] }
+const empLabel = { FULL_TIME: "Full-time", PART_TIME: "Part-time", CONTRACTOR: "Contract", INTERN: "Internship" };
+const regionLabel = { "United States": "US", "United Kingdom": "UK" };
+---
+<form class="board searchbar" action="/" method="get" role="search">
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+    <input type="search" name="q" placeholder="Search remote HR jobs…" aria-label="Search jobs" />
+  </div>
+  <div class="controls">
+    <label class="remote-toggle"><input type="checkbox" name="remote" value="1" onchange="this.form.submit()" /> Fully remote only</label>
+    <select class="filter-select" name="type" aria-label="Filter by employment type" onchange="this.form.submit()">
+      <option value="">All types</option>
+      {options.emp.map((e) => <option value={e}>{empLabel[e] || e}</option>)}
+    </select>
+    <select class="filter-select" name="level" aria-label="Filter by level" onchange="this.form.submit()">
+      <option value="">All levels</option>
+      {options.level.map((l) => <option value={l}>{l}</option>)}
+    </select>
+    <select class="filter-select" name="region" aria-label="Filter by region" onchange="this.form.submit()">
+      <option value="">All regions</option>
+      {options.region.map((r) => <option value={r}>{regionLabel[r] || r}</option>)}
+    </select>
+  </div>
+</form>

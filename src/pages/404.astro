@@ -1,0 +1,21 @@
+---
+// src/pages/404.astro — friendly 404 with routes back into the site.
+import Base from "../layouts/Base.astro";
+---
+<Base title="Page not found (404) | HRJobsRemote" description="That page doesn't exist. Browse remote HR jobs by role, or head back to the homepage." noindex={true}>
+  <section class="hero">
+    <span class="eyebrow">404</span>
+    <h1>We couldn't find that page</h1>
+    <p class="lede">The link may be old or the job may have closed. Try one of these:</p>
+  </section>
+  <nav class="related-links" aria-label="Popular pages">
+    <ul>
+      <li><a href="/">All remote HR jobs</a></li>
+      <li><a href="/remote-recruiter-jobs">Recruiter jobs</a></li>
+      <li><a href="/remote-hr-business-partner-jobs">HR Business Partner jobs</a></li>
+      <li><a href="/remote-hr-manager-jobs">HR Manager jobs</a></li>
+      <li><a href="/companies">Companies</a></li>
+      <li><a href="/blog">HR career guides</a></li>
+    </ul>
+  </nav>
+</Base>

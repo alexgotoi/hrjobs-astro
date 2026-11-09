@@ -1,0 +1,13 @@
+{
+  "name": "HRJobsRemote",
+  "short_name": "HRJobsRemote",
+  "description": "Curated remote jobs for HR professionals.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0b45a",
+  "theme_color": "#f0b45a",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

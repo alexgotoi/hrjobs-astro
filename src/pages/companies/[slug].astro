@@ -1,0 +1,55 @@
+---
+// src/pages/companies/[slug].astro — one page per company aggregating its open roles.
+import Base from "../../layouts/Base.astro";
+import JobBoard from "../../components/JobBoard.astro";
+import CompanyLogo from "../../components/CompanyLogo.astro";
+import { getJobs } from "../../lib/airtable.mjs";
+import { buildCompanyPages } from "../../lib/landing.mjs";
+import { breadcrumbSchema } from "../../lib/schema.mjs";
+
+export async function getStaticPaths() {
+  const open = (await getJobs()).filter((j) => !j.closed);
+  return buildCompanyPages(open).map((c) => ({ params: { slug: c.slug }, props: { co: c } }));
+}
+
+const { co } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const url = `${site}/companies/${co.slug}`;
+const n = co.jobs.length;
+const cats = [...new Set(co.jobs.map((j) => j.hrCategory).filter(Boolean))];
+const catText = cats.length ? cats.slice(0, 4).join(", ") : "HR";
+
+const intro = `${co.company} has ${n} remote HR ${n === 1 ? "role" : "roles"} open on HRJobsRemote, across ${catText}. All positions are remote-friendly.`;
+
+const org = {
+  "@context": "https://schema.org", "@type": "Organization",
+  name: co.company, ...(co.logo ? { logo: co.logo } : {}),
+};
+const itemList = {
+  "@context": "https://schema.org", "@type": "ItemList", name: `Remote jobs at ${co.company}`,
+  numberOfItems: n,
+  itemListElement: co.jobs.map((j, i) => ({ "@type": "ListItem", position: i + 1, url: `${site}/jobs/${j.slug}`, name: j.title })),
+};
+const crumbs = [
+  { name: "Home", url: `${site}/` },
+  { name: "Companies", url: `${site}/companies` },
+  { name: co.company, url },
+];
+---
+<Base
+  title={`Remote HR Jobs at ${co.company} (${n} open) | HRJobsRemote`}
+  description={intro.slice(0, 158)}
+  canonical={url}
+  schemas={[org, itemList, breadcrumbSchema(crumbs)]}
+  wide={true}
+>
+  <header class="job-header">
+    <CompanyLogo company={co.company} logo={co.logo} size={64} />
+    <div>
+      <span class="eyebrow">Company</span>
+      <h1>Remote HR jobs at {co.company}</h1>
+    </div>
+  </header>
+
+  <JobBoard jobs={co.jobs} showCategoryFilter={cats.length > 1} />
+</Base>

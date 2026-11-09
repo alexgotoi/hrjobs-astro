@@ -1,0 +1,25 @@
+---
+/**
+ * Faq.astro — renders a visible FAQ section as native <details> accordions.
+ *
+ * IMPORTANT: the visible text here must match the FAQPage JSON-LD emitted by the
+ * page (built from the same array via faqSchema()). Pass the identical `items`
+ * array to both, so Google never sees a schema/content mismatch.
+ *
+ * Props:
+ *   items: { q: string, a: string }[]  — the questions and answers to show.
+ *   heading?: string                   — section heading (default "Frequently asked questions").
+ */
+const { items, heading = "Frequently asked questions" } = Astro.props;
+---
+{items && items.length > 0 && (
+  <section class="faq" aria-label={heading}>
+    <h2>{heading}</h2>
+    {items.map((f) => (
+      <details>
+        <summary>{f.q}</summary>
+        <p>{f.a}</p>
+      </details>
+    ))}
+  </section>
+)}

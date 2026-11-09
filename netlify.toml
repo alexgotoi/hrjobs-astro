@@ -1,0 +1,9 @@
+# Netlify build configuration for the HRJobsRemote Astro site.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# public/_redirects handles the 301s from the old Softr URLs.

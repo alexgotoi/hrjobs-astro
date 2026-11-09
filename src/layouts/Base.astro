@@ -1,0 +1,166 @@
+---
+// src/layouts/Base.astro
+import "../styles/global.css";
+import { organizationSchema, websiteSchema, jsonLd } from "../lib/schema.mjs";
+import { ALL_CATEGORIES, catSlug } from "../lib/util.mjs";
+
+const {
+  title,
+  description,
+  canonical,
+  image,
+  noindex = false,
+  schemas = [],        // array of page-specific JSON-LD objects
+  ogType = "website",
+  wide = false,        // wide layout (e.g. the two-column job page)
+} = Astro.props;
+
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = image || `${site}/og-default.png`;
+
+// External links used in the menu/footer.
+// TODO: replace ADD_JOB_FORM with your real Airtable form URL (the one that creates a Jobs record).
+const ADD_JOB_FORM = "https://airtable.com/REPLACE_WITH_YOUR_FORM";
+const EXCEL_COURSE = "https://excelforhr.com";
+// TODO: the newsletter capture BAND posts emails to this endpoint (your provider's form
+// "action" URL — Beehiiv/MailerLite/etc. The email field is named "email").
+const NEWSLETTER_ACTION = "https://YOUR-NEWSLETTER-PROVIDER/subscribe";
+// TODO: the "Newsletter" menu BUTTON links here — your public newsletter page (the Beehiiv
+// publication URL once you move there, e.g. https://hrjobsremote.beehiiv.com).
+const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Favicons / app icons (generated from the brand logo in public/) -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f0b45a" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex
+      ? <meta name="robots" content="noindex,follow" />
+      : <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />}
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="HRJobsRemote" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- display font, limited, swap for good CWV -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap"
+    />
+
+    <!-- Sitewide schema: Organization + WebSite (enables a search box in Google) -->
+    <script type="application/ld+json" set:html={jsonLd(organizationSchema())} />
+    <script type="application/ld+json" set:html={jsonLd(websiteSchema())} />
+    <!-- page-specific schema -->
+    {schemas.filter(Boolean).map((s) => (
+      <script type="application/ld+json" set:html={jsonLd(s)} />
+    ))}
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="nav-row">
+        <div class="wrap wrap-wide">
+          <a class="brand" href="/">HRJobs<b>Remote</b></a>
+          <nav class="nav">
+            <a href="/resources">Resources</a>
+            <a href={NEWSLETTER_URL} target="_blank" rel="noopener">Newsletter</a>
+            <a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR</a>
+            <a class="btn-add" href={ADD_JOB_FORM} target="_blank" rel="noopener">Add a job</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <section class="nl-band" aria-label="Remote HR jobs newsletter">
+      <div class={`wrap wrap-wide nl-wrap ${Astro.slots.has("hero") ? "nl-has-hero" : ""}`}>
+        {Astro.slots.has("hero") && <div class="nl-hero"><slot name="hero" /></div>}
+        <div class="nl-inner">
+          <p class="nl-proof">Join <b>16,000+</b> HR professionals getting new remote jobs <b>every week</b></p>
+          <div class="nl-cta">
+            <form class="nl-form" action={NEWSLETTER_ACTION} method="post" target="_blank" rel="noopener">
+              <input type="email" name="email" required placeholder="Your email" aria-label="Email address" />
+              <button type="submit">Subscribe</button>
+            </form>
+            <span class="nl-note">No spam. Unsubscribe anytime.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class={`wrap ${wide ? "wrap-wide" : ""}`}>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap wrap-wide">
+        <div class="cols">
+          <div>
+            <a class="brand" href="/">HRJobs<b>Remote</b></a>
+            <p class="tagline">Hand-picked remote jobs for HR professionals — recruiters, HRBPs, people-ops and more.</p>
+          </div>
+          <div>
+            <h4>Remote jobs by category</h4>
+            <ul>
+              {ALL_CATEGORIES.map((c) => (
+                <li><a href={`/${catSlug(c)}`}>{c} remote jobs</a></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="/resources">HR career resources</a></li>
+              <li><a href="/salary-guides">HR salary guides</a></li>
+              <li><a href="/collections">Job collections</a></li>
+              <li><a href="/blog">Articles &amp; guides</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>More</h4>
+            <ul>
+              <li><a href="/">All remote HR jobs</a></li>
+              <li><a href="/companies">Browse companies</a></li>
+              <li><a href={NEWSLETTER_URL} target="_blank" rel="noopener">Newsletter</a></li>
+              <li><a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR (course)</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="legal">© {new Date().getFullYear()} HRJobsRemote · Remote HR jobs since 2019</div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      (function () {
+        var h = document.querySelector(".site-header");
+        var set = function () {
+          document.documentElement.style.setProperty("--header-h", ((h && h.offsetHeight) || 64) + "px");
+        };
+        set();
+        window.addEventListener("resize", set);
+      })();
+    </script>
+  </body>
+</html>
