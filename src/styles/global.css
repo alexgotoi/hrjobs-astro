@@ -341,3 +341,4 @@ main.wrap { padding-top: 2.2rem; padding-bottom: 1rem; }
 .empty-note { background: var(--teal-wash); border: 1px solid color-mix(in srgb, var(--teal) 16%, var(--line)); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin: 0 0 2rem; }
 .empty-note p { margin: 0 0 0.6rem; }
 .empty-note p:last-child { margin: 0; color: var(--ink-soft); }
+.jb-row[hidden] { display: none !important; }
