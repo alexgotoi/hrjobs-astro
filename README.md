@@ -4,7 +4,7 @@ Curated **remote jobs for HR professionals**, online since 2019. This is the Ast
 Airtable rebuild, optimized for search (incl. Google for Jobs) and AI answer engines.
 
 Static site, no backend: Airtable is read at build time and every page is pre-rendered.
-A companion repo, `feed-sync`, fills Airtable from job feeds daily and triggers rebuilds.
+A companion repo, `feed-sync`, fills Airtable from job feeds daily and triggers rebuilds. 
 
 ## Quick start
 ```bash
