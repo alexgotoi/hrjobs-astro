@@ -1,0 +1,85 @@
+---
+// src/pages/[landing].astro — all programmatic landing pages:
+// category, role×region, role×level, region×HR, level×HR. One template, many slugs.
+import Base from "../layouts/Base.astro";
+import JobBoard from "../components/JobBoard.astro";
+import Faq from "../components/Faq.astro";
+import { getJobs } from "../lib/airtable.mjs";
+import { buildLandingPages, relatedLinks } from "../lib/landing.mjs";
+import { breadcrumbSchema, faqSchema } from "../lib/schema.mjs";
+import { categoryFaq } from "../lib/faq.mjs";
+import { catSlug, sortJobs, ALL_CATEGORIES } from "../lib/util.mjs";
+
+export async function getStaticPaths() {
+  const open = (await getJobs()).filter((j) => !j.closed);
+  const pages = buildLandingPages(open);
+  return pages.map((p) => ({
+    params: { landing: p.slug },
+    props: { page: p, related: relatedLinks(p, pages) },
+  }));
+}
+
+const { page, related } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const url = `${site}/${page.slug}`;
+const metaDesc = page.intro.slice(0, 158);
+
+const jobsSorted = sortJobs(page.jobs);
+const isEmpty = page.empty === true;
+
+// ItemList only when there are jobs (an empty ItemList is pointless and can read as thin).
+const itemList = isEmpty ? null : {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: page.itemListName,
+  numberOfItems: jobsSorted.length,
+  itemListElement: jobsSorted.map((j, i) => ({
+    "@type": "ListItem", position: i + 1, url: `${site}/jobs/${j.slug}`, name: j.title,
+  })),
+};
+
+// Breadcrumbs: role×region and role×level sit under their category page.
+const crumbs = [{ name: "Home", url: `${site}/` }];
+if ((page.kind === "role-region" || page.kind === "role-level") && page.cat) {
+  crumbs.push({ name: `Remote ${page.cat} jobs`, url: `${site}/${catSlug(page.cat)}` });
+}
+crumbs.push({ name: page.h1, url });
+
+// On an empty category page, offer the other categories that do have openings.
+const otherCats = isEmpty
+  ? ALL_CATEGORIES.filter((c) => c !== page.cat).map((c) => ({ name: `Remote ${c} jobs`, href: `/${catSlug(c)}` }))
+  : [];
+
+// FAQ only on populated CANONICAL category pages (not on the programmatic combo pages),
+// so the Q&A content stays unique per page rather than duplicated across many combos.
+const faqItems = page.kind === "category" && !isEmpty ? categoryFaq(page.cat) : [];
+---
+<Base title={page.title} description={metaDesc} canonical={url} schemas={[itemList, breadcrumbSchema(crumbs), faqSchema(faqItems)].filter(Boolean)} wide={true}>
+  <span class="eyebrow">{page.eyebrow}</span>
+  <h1>{page.h1}</h1>
+  {isEmpty && <p class="answer">{page.intro}</p>}
+
+  {isEmpty ? (
+    <div class="empty-cat">
+      <h2>Browse other remote HR categories</h2>
+      <nav class="related-links" aria-label="Other categories">
+        <ul>
+          {otherCats.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  ) : (
+    <>
+      <JobBoard jobs={jobsSorted} showCategoryFilter={page.showCategoryFilter} />
+      {related.length > 0 && (
+        <nav class="related-links" aria-label="Related searches">
+          <h2>Related searches</h2>
+          <ul>
+            {related.map((r) => <li><a href={r.href}>{r.label}</a></li>)}
+          </ul>
+        </nav>
+      )}
+      <Faq items={faqItems} heading={`Remote ${page.cat} jobs — FAQ`} />
+    </>
+  )}
+</Base>

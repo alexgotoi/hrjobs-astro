@@ -1,0 +1,118 @@
+---
+// src/pages/jobs/[slug].astro — job detail page, fully fed from Airtable.
+import Base from "../../layouts/Base.astro";
+import JobBoard from "../../components/JobBoard.astro";
+import CompanyLogo from "../../components/CompanyLogo.astro";
+import { getJobs } from "../../lib/airtable.mjs";
+import { jobPostingSchema, breadcrumbSchema } from "../../lib/schema.mjs";
+import { catSlug, companySlug, sortJobs } from "../../lib/util.mjs";
+
+export async function getStaticPaths() {
+  const jobs = await getJobs(); // open + closed (closed stays indexable)
+  const open = jobs.filter((j) => !j.closed);
+  return jobs.map((job) => {
+    const related = sortJobs(open.filter((j) => j.hrCategory === job.hrCategory && j.slug !== job.slug)).slice(0, 8);
+    return { params: { slug: job.slug }, props: { job, related } };
+  });
+}
+
+const { job, related } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const jobUrl = `${site}/jobs/${job.slug}`;
+
+const empMap = { FULL_TIME: "Full-time", PART_TIME: "Part-time", CONTRACTOR: "Contract", INTERN: "Internship" };
+const emp = empMap[job.employmentType] || "Full-time";
+
+const physical = [job.city, job.state, job.country].filter(Boolean).join(", ");
+const fully = job.remoteType === "Fully Remote";
+const hybridish = job.remoteType === "Hybrid" || job.remoteType === "Partially Remote";
+const remoteish = ["Fully Remote", "Hybrid", "Partially Remote", "Potentially Remote"].includes(job.remoteType);
+
+const locationLabel = fully
+  ? `Remote${job.remoteRegion ? ` · ${job.remoteRegion}` : ""}`
+  : hybridish
+    ? `${job.remoteType}${physical ? ` · ${physical}` : ""}`
+    : job.remoteType === "Potentially Remote"
+      ? `Potentially remote${physical ? ` · ${physical}` : ""}`
+      : physical || "—";
+
+const remotePhrase = fully ? "fully remote"
+  : job.remoteType === "Hybrid" ? "hybrid"
+  : job.remoteType === "Partially Remote" ? "partially remote"
+  : job.remoteType === "Potentially Remote" ? "potentially remote"
+  : "on-site";
+
+// Used only for the meta description tag (not shown on the page anymore).
+const answer = `${job.title} is a ${remotePhrase}, ${emp.toLowerCase()} ${job.hrCategory || "HR"} role at ${job.company || "an HR employer"}${
+  remoteish && job.remoteRegion ? `, open to applicants in ${job.remoteRegion}` : (!remoteish && physical ? `, based in ${physical}` : "")
+}.`;
+
+
+const title = `${job.closed ? "[Closed] " : ""}${job.title}${job.company ? ` at ${job.company}` : ""} | HRJobsRemote`;
+const metaDesc = `${answer} ${job.closed ? "This role is now closed." : "See details and apply."}`.slice(0, 158);
+
+const crumbs = [
+  { name: "Home", url: `${site}/` },
+  ...(job.hrCategory ? [{ name: `${job.hrCategory} jobs`, url: `${site}/${catSlug(job.hrCategory)}` }] : []),
+  { name: job.title, url: jobUrl },
+];
+
+const schemas = [jobPostingSchema(job, jobUrl), breadcrumbSchema(crumbs)];
+---
+<Base title={title} description={metaDesc} canonical={jobUrl} schemas={schemas} ogType="article" wide={true}>
+  <header class="job-header">
+    <CompanyLogo company={job.company} logo={job.companyLogo} size={64} />
+    <div>
+      <span class="eyebrow">{job.hrCategory || "HR"}{job.careerLevel && job.careerLevel !== "Individual Contributor" ? ` · ${job.careerLevel}` : ""}</span>
+      <h1>{job.closed ? "[Closed] " : ""}{job.title}</h1>
+      {job.company && <p class="job-company-name"><a href={`/companies/${companySlug(job.company)}`}>{job.company}</a></p>}
+    </div>
+  </header>
+
+  {job.closed && (
+    <p class="closed-banner">This position is no longer accepting applications. It is kept here for reference.</p>
+  )}
+
+  <div class="job-grid">
+    <div class="job-main">
+      <div class="prose" set:html={job.description} />
+      {!job.closed && job.applyUrl && (
+        <div class="apply-end">
+          <a class="cta" href={job.applyUrl} rel="nofollow noopener" target="_blank">Apply for this role →</a>
+          <p class="cta-note">Opens the employer's site</p>
+        </div>
+      )}
+    </div>
+
+    <aside class="job-aside">
+      <div class="spec">
+        <div class="spec-head">Role details</div>
+        <dl>
+          <div class="row"><dt>Company</dt><dd>{job.company ? <a href={`/companies/${companySlug(job.company)}`}>{job.company}</a> : "—"}</dd></div>
+          <div class="row"><dt>Work</dt><dd>{job.remoteType}</dd></div>
+          <div class="row"><dt>Location</dt><dd>{locationLabel}</dd></div>
+          <div class="row"><dt>Type</dt><dd>{emp}</dd></div>
+          <div class="row"><dt>Category</dt><dd>{job.hrCategory || "HR"}</dd></div>
+          {job.careerLevel && job.careerLevel !== "Individual Contributor" && (
+            <div class="row"><dt>Level</dt><dd>{job.careerLevel}</dd></div>
+          )}
+          {job.datePosted && <div class="row"><dt>Posted</dt><dd>{job.datePosted}</dd></div>}
+        </dl>
+      </div>
+
+      {!job.closed && job.applyUrl && (
+        <div>
+          <a class="cta" href={job.applyUrl} rel="nofollow noopener" target="_blank">Apply for this role →</a>
+          <p class="cta-note">Opens the employer's site</p>
+        </div>
+      )}
+    </aside>
+  </div>
+
+  {related.length > 0 && (
+    <section class="related">
+      <div class="section-head"><h2>More {job.hrCategory} jobs</h2><a href={`/${catSlug(job.hrCategory)}`}>See all →</a></div>
+      <JobBoard jobs={related} showSearch={false} showControls={false} showCategoryFilter={false} showCount={false} />
+    </section>
+  )}
+</Base>

@@ -1,0 +1,45 @@
+---
+// src/pages/salary-guides.astro — lists articles categorised as salary guides.
+import Base from "../layouts/Base.astro";
+import { getArticles } from "../lib/airtable.mjs";
+
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const guides = (await getArticles())
+  .filter((a) => /salary|compensation|pay/i.test(`${a.category} ${a.title}`))
+  .sort((a, b) => new Date(b.datePublished) - new Date(a.datePublished));
+const fmt = (d) => (d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "");
+
+const itemList = {
+  "@context": "https://schema.org", "@type": "ItemList", name: "Remote HR salary guides",
+  numberOfItems: guides.length,
+  itemListElement: guides.map((a, i) => ({ "@type": "ListItem", position: i + 1, url: `${site}/blog/${a.slug}`, name: a.title })),
+};
+---
+<Base
+  title="Remote HR Salary Guides | HRJobsRemote"
+  description="Salary guides and pay benchmarks for remote HR roles — recruiters, HR business partners, people-ops, L&D and more."
+  canonical={`${site}/salary-guides`}
+  schemas={[itemList]}
+  wide={true}
+>
+  <span class="eyebrow">Resources · Salary guides</span>
+  <h1>Remote HR salary guides</h1>
+  <p class="answer">How much do remote HR roles pay? Our salary guides break down pay ranges and benchmarks across HR specialisms, updated as the market moves.</p>
+
+  {guides.length > 0 ? (
+    <div class="cards">
+      {guides.map((a) => (
+        <a class="card-post" href={`/blog/${a.slug}`}>
+          {a.category && <span class="label">{a.category}</span>}
+          <span class="t">{a.title}</span>
+          {a.summary && <span class="muted" style="font-size:0.95rem;line-height:1.5;">{a.summary.slice(0, 120)}{a.summary.length > 120 ? "…" : ""}</span>}
+          <span class="d">{fmt(a.datePublished)}</span>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <div class="empty-cat">
+      <p class="muted">Salary guides are on the way. In the meantime, browse our <a href="/blog">HR career articles</a> or the <a href="/">remote HR jobs board</a>.</p>
+    </div>
+  )}
+</Base>

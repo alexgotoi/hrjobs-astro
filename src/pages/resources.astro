@@ -1,0 +1,51 @@
+---
+// src/pages/resources.astro — the Resources hub: salary guides, collections, articles.
+import Base from "../layouts/Base.astro";
+import { getArticles } from "../lib/airtable.mjs";
+import { buildCollections } from "../lib/collections.mjs";
+import { getJobs } from "../lib/airtable.mjs";
+
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+const articles = await getArticles();
+const open = (await getJobs()).filter((j) => !j.closed);
+const collections = buildCollections(open);
+const salaryCount = articles.filter((a) => /salary/i.test(a.category || "")).length;
+
+// A hub page is a collection of other pages → CollectionPage schema.
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "HR career resources",
+  url: `${site}/resources`,
+  description: "Remote HR salary guides, curated job collections, and career articles for HR professionals.",
+};
+
+const EXCEL_COURSE = "https://excelforhr.com";
+const cards = [
+  { href: "/salary-guides", label: salaryCount ? `${salaryCount} guide${salaryCount === 1 ? "" : "s"}` : "Guides", title: "HR Remote Salary Guides", desc: "What remote HR roles pay — salary ranges and benchmarks for recruiters, HRBPs, people-ops and more." },
+  { href: "/collections", label: `${collections.length} collections`, title: "Remote HR Job Collections", desc: "Curated groupings of remote HR jobs — entry-level, leadership, work-from-anywhere and more." },
+  { href: "/blog", label: `${articles.length} article${articles.length === 1 ? "" : "s"}`, title: "Articles & Career Guides", desc: "Practical advice on landing and growing a remote HR career — job search, interviews and remote work." },
+  { href: EXCEL_COURSE, label: "Course", title: "Excel for HR", desc: "Level up the Excel skills every HR professional needs. Our hands-on course for people teams.", external: true },
+];
+---
+<Base
+  title="HR Career Resources — Salary Guides, Collections & Articles | HRJobsRemote"
+  description="Free resources for remote HR professionals: salary guides, curated job collections, and career articles."
+  canonical={`${site}/resources`}
+  schemas={[schema]}
+  wide={true}
+>
+  <span class="eyebrow">Resources</span>
+  <h1>HR career resources</h1>
+  <p class="answer">Everything beyond the job board — remote HR salary guides, curated job collections, and career articles to help you find and grow a remote HR career.</p>
+
+  <div class="cards">
+    {cards.map((c) => (
+      <a class="card-post" href={c.href} {...(c.external ? { target: "_blank", rel: "noopener" } : {})}>
+        <span class="label">{c.label}</span>
+        <span class="t">{c.title}</span>
+        <span class="muted" style="font-size:0.95rem;line-height:1.5;">{c.desc}</span>
+      </a>
+    ))}
+  </div>
+</Base>
