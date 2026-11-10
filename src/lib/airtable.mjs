@@ -67,7 +67,7 @@ const JOB_FIELDS = [
   "Featured Until", "Date Posted", "Closed Date",
 ];
 const BLOG_FIELDS = [
-  "Title", "Slug", "Summary", "Body", "Author", "Author Bio", "Category",
+  "Title", "Slug", "Summary", "Body", "Author", "Category",
   "Image", "Date Published", "Date Modified", "FAQ", "Published",
 ];
 
