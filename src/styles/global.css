@@ -163,6 +163,10 @@ main.wrap { padding-top: 2.2rem; padding-bottom: 1rem; }
 .board-head .showing { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
 .board-head .showing b { color: var(--ink); }
 
+/* Collapsible filters — the toggle button only appears on phones (see mobile block). */
+.filter-toggle { display: none; }
+.board-filters { display: block; }
+
 /* ===== Remotive-style job rows ===== */
 .jb-list { list-style: none; padding: 0; margin: 0.4rem 0 0; display: flex; flex-direction: column; gap: 10px; }
 .jb-row { position: relative; display: flex; gap: 14px; align-items: flex-start; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; color: var(--ink); transition: border-color 0.13s, transform 0.13s, box-shadow 0.13s; }
@@ -236,8 +240,46 @@ main.wrap { padding-top: 2.2rem; padding-bottom: 1rem; }
   padding: 0.12rem 0.55rem; margin-bottom: 0.4rem;
 }
 @media (max-width: 560px) {
-  .jb-row { flex-wrap: wrap; }
-  .jb-meta { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; margin-top: 0.2rem; padding-left: 62px; }
+  /* --- Header: brand on top, the 4 menu items on ONE compact line --- */
+  .nav-row .wrap { flex-direction: column; align-items: stretch; gap: 0.5rem; padding: 0.6rem 16px; }
+  .brand { font-size: 1.15rem; }
+  .nav { flex-wrap: nowrap; gap: 0.2rem; justify-content: space-between; width: 100%; }
+  .nav a { font-size: 0.6rem; letter-spacing: 0.01em; padding: 0.45rem 0.4rem; white-space: nowrap; }
+
+  /* --- Filters collapse behind a "Filters" button; search stays visible --- */
+  .filter-toggle {
+    display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;
+    font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em;
+    color: var(--ink-soft); background: var(--card); border: 1px solid var(--line-strong);
+    border-radius: 8px; padding: 0.5rem 0.9rem; margin-top: 0.8rem;
+  }
+  .filter-toggle svg { width: 15px; height: 15px; }
+  .filter-toggle[aria-expanded="true"] { border-color: var(--teal); color: var(--teal); }
+  .board-filters { display: none; }
+  .board-filters.open { display: block; }
+  .board-filters .filters { margin-top: 0.7rem; }
+  .board-filters .controls { margin-top: 0.6rem; }
+
+  /* --- Compact job tiles --- */
+  .jb-list { gap: 8px; }
+  .jb-row { padding: 0.7rem 0.8rem; gap: 11px; flex-wrap: wrap; }
+  .jb-row .logo-box { --logo-size: 40px !important; }
+  .jb-title { font-size: 1rem; line-height: 1.2; }
+  .jb-company { font-size: 0.8rem; margin-top: 0.1rem; }
+  .jb-tags { gap: 0.3rem; margin-top: 0.45rem; }
+  .tag { font-size: 0.65rem; padding: 0.1rem 0.5rem; }
+  .jb-meta { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; margin-top: 0.45rem; padding-left: 51px; gap: 0.5rem; }
+  .jb-date { font-size: 0.68rem; }
+  .jb-apply { font-size: 0.7rem; padding: 0.35rem 0.8rem; }
+  .search { margin-top: 1rem; }
+  .search input { font-size: 0.95rem; padding: 0.72rem 1rem 0.72rem 2.5rem; }
+  .board-head { margin: 1rem 0 0.5rem; }
+
+  /* Newsletter signup: stack email + button so "Subscribe" never overflows the screen.
+     Scoped to .nl-has-hero to beat the base "flex-wrap: nowrap" on that variant. */
+  .nl-has-hero .nl-form { flex-wrap: wrap; }
+  .nl-has-hero .nl-form input { flex: 1 1 100%; min-width: 0; }
+  .nl-has-hero .nl-form button { flex: 1 1 100%; }
 }
 
 /* section head */

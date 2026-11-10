@@ -62,32 +62,41 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
     </div>
   )}
 
-  {showCategoryFilter && (
-    <div class="filters">
-      <button class="pill active" data-cat="" aria-pressed="true">All<span class="c">{jobs.length}</span></button>
-      {cats.map((c) => (
-        <button class="pill" data-cat={c} aria-pressed="false">{c}<span class="c">{counts[c]}</span></button>
-      ))}
-    </div>
+  {(showCategoryFilter || showControls) && (
+    <button type="button" class="filter-toggle js-filter-toggle" aria-expanded="false" aria-controls="board-filters">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+      Filters
+    </button>
   )}
 
-  {showControls && (
-    <div class="controls">
-      <label class="remote-toggle"><input type="checkbox" class="js-remote-only" /> Fully remote only</label>
-      <select class="filter-select js-emp" aria-label="Filter by employment type">
-        <option value="">All types</option>
-        {empOpts.map((e) => <option value={e}>{empLabel[e] || e}</option>)}
-      </select>
-      <select class="filter-select js-level" aria-label="Filter by level">
-        <option value="">All levels</option>
-        {levelOpts.map((l) => <option value={l}>{l}</option>)}
-      </select>
-      <select class="filter-select js-region" aria-label="Filter by region">
-        <option value="">All regions</option>
-        {regionOpts.map((r) => <option value={r}>{regionLabel[r] || r}</option>)}
-      </select>
-    </div>
-  )}
+  <div class="board-filters" id="board-filters">
+    {showCategoryFilter && (
+      <div class="filters">
+        <button class="pill active" data-cat="" aria-pressed="true">All<span class="c">{jobs.length}</span></button>
+        {cats.map((c) => (
+          <button class="pill" data-cat={c} aria-pressed="false">{c}<span class="c">{counts[c]}</span></button>
+        ))}
+      </div>
+    )}
+
+    {showControls && (
+      <div class="controls">
+        <label class="remote-toggle"><input type="checkbox" class="js-remote-only" /> Fully remote only</label>
+        <select class="filter-select js-emp" aria-label="Filter by employment type">
+          <option value="">All types</option>
+          {empOpts.map((e) => <option value={e}>{empLabel[e] || e}</option>)}
+        </select>
+        <select class="filter-select js-level" aria-label="Filter by level">
+          <option value="">All levels</option>
+          {levelOpts.map((l) => <option value={l}>{l}</option>)}
+        </select>
+        <select class="filter-select js-region" aria-label="Filter by region">
+          <option value="">All regions</option>
+          {regionOpts.map((r) => <option value={r}>{regionLabel[r] || r}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
 
   {showCount && (
     <div class="board-head">
@@ -185,6 +194,14 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
     const countEl = board.querySelector(".js-count");
     const empty = board.querySelector(".jb-empty");
     let activeCat = "";
+
+    // Collapsible filters (the toggle button only shows on phones).
+    const fToggle = board.querySelector(".js-filter-toggle");
+    const fWrap = board.querySelector(".board-filters");
+    fToggle?.addEventListener("click", () => {
+      const open = fWrap?.classList.toggle("open");
+      fToggle.setAttribute("aria-expanded", String(!!open));
+    });
 
     const apply = () => {
       const q = (search?.value || "").trim().toLowerCase();
