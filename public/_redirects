@@ -22,7 +22,7 @@
 /remote-recruiter-jobs-in-united-states  /remote-recruiter-jobs-in-us   301
 
 # --- Utility / deprecated pages ---
-/add-job      https://airtable.com/REPLACE_WITH_YOUR_FORM   301!
+/add-job      /post-a-job   301!
 /checkout     /   301
 /newsletter   /   301   # or point to your newsletter provider's signup URL
 /job-details      /   301   # old Softr job template
