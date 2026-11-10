@@ -19,9 +19,8 @@ const site = Astro.site?.toString().replace(/\/$/, "") || "";
 const canonicalUrl = canonical || new URL(Astro.url.pathname, Astro.site).toString();
 const ogImage = image || `${site}/og-default.png`;
 
-// External links used in the menu/footer.
-// TODO: replace ADD_JOB_FORM with your real Airtable form URL (the one that creates a Jobs record).
-const ADD_JOB_FORM = "https://airtable.com/REPLACE_WITH_YOUR_FORM";
+// External links used in the menu/footer. Employer CTAs now route through the on-site
+// /post-a-job landing page (not straight to a form), so there's no add-a-job form URL here.
 const EXCEL_COURSE = "https://excelforhr.com";
 // TODO: the newsletter capture BAND posts emails to this endpoint (your provider's form
 // "action" URL — Beehiiv/MailerLite/etc. The email field is named "email").
@@ -88,7 +87,7 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
             <a href="/resources">Resources</a>
             <a href={NEWSLETTER_URL} target="_blank" rel="noopener">Newsletter</a>
             <a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR</a>
-            <a class="btn-add" href={ADD_JOB_FORM} target="_blank" rel="noopener">Add a job</a>
+            <a class="btn-add" href="/post-a-job">Post a job</a>
           </nav>
         </div>
       </div>
@@ -143,6 +142,7 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
             <ul>
               <li><a href="/">All remote HR jobs</a></li>
               <li><a href="/companies">Browse companies</a></li>
+              <li><a href="/post-a-job">Post a job (employers)</a></li>
               <li><a href={NEWSLETTER_URL} target="_blank" rel="noopener">Newsletter</a></li>
               <li><a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR (course)</a></li>
             </ul>

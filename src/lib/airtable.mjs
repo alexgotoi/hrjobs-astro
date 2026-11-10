@@ -56,12 +56,28 @@ import mockArticles from "../data/mock-articles.json";
 const TOKEN = import.meta.env.AIRTABLE_TOKEN || process.env.AIRTABLE_TOKEN;
 const BASE = import.meta.env.AIRTABLE_BASE_ID || process.env.AIRTABLE_BASE_ID;
 
-async function fetchAll(table) {
+// Privacy allow-lists: the build fetches ONLY these columns. Operational / sensitive
+// Jobs fields — Contact Email, Payment Status, Stripe Payment ID, Record ID, Company
+// Website — are deliberately NOT requested, so they can never reach a built page, feed,
+// sitemap or JSON-LD even by accident. "Featured Until" is fetched to drive expiry.
+const JOB_FIELDS = [
+  "Source ID", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
+  "Company Logo", "City", "State", "Country", "HR Category", "Career Level",
+  "Remote Type", "Remote Region", "Employment Type", "CPC", "Featured",
+  "Featured Until", "Date Posted", "Closed Date",
+];
+const BLOG_FIELDS = [
+  "Title", "Slug", "Summary", "Body", "Author", "Author Bio", "Category",
+  "Image", "Date Published", "Date Modified", "FAQ", "Published",
+];
+
+async function fetchAll(table, fields) {
   const records = [];
   let offset;
   do {
     const url = new URL(`https://api.airtable.com/v0/${BASE}/${encodeURIComponent(table)}`);
     url.searchParams.set("pageSize", "100");
+    for (const f of fields || []) url.searchParams.append("fields[]", f); // explicit allow-list
     if (offset) url.searchParams.set("offset", offset);
     const res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
     if (!res.ok) throw new Error(`Airtable ${table} ${res.status}: ${await res.text()}`);
@@ -74,6 +90,18 @@ async function fetchAll(table) {
 
 const live = Boolean(TOKEN && BASE);
 
+// Build date (UTC, YYYY-MM-DD) — the reference point for paid featured windows.
+const BUILD_DATE = new Date().toISOString().slice(0, 10);
+
+// A job is featured only if the Featured box is ticked AND the paid window is still open:
+// Featured Until empty → featured indefinitely; otherwise featured only through that date.
+function isFeatured(j) {
+  const checked = j["Featured"] === true || j["Featured"] === "true";
+  if (!checked) return false;
+  const until = j["Featured Until"];
+  return !until || String(until).slice(0, 10) >= BUILD_DATE;
+}
+
 /**
  * All jobs (open + closed). Closed jobs are kept because their pages stay indexable
  * with a "[Closed]" label and a past validThrough — losing them would drop earned
@@ -81,7 +109,10 @@ const live = Boolean(TOKEN && BASE);
  * @returns {Promise<Job[]>}
  */
 export async function getJobs() {
-  const rows = live ? await fetchAll("Jobs") : mockJobs;
+  const rows = live ? await fetchAll("Jobs", JOB_FIELDS) : mockJobs;
+  // Publishing safety: only approved jobs are ever built. Paid submissions arrive with
+  // Status blank and are excluded here until you set Status = "open". (Closed jobs are
+  // kept on purpose as indexable "[Closed]" pages; callers hide them from live listings.)
   return rows
     .filter((j) => j.Status === "open" || j.Status === "closed")
     .map(normalizeJob);
@@ -92,7 +123,7 @@ export async function getJobs() {
  * @returns {Promise<Article[]>}
  */
 export async function getArticles() {
-  const rows = live ? await fetchAll("Blog") : mockArticles;
+  const rows = live ? await fetchAll("Blog", BLOG_FIELDS) : mockArticles;
   return rows.filter((a) => a.Published).map(normalizeArticle);
 }
 
@@ -116,7 +147,7 @@ function normalizeJob(j) {
     remoteRegion: j["Remote Region"] || "",
     employmentType: j["Employment Type"] || "FULL_TIME",
     cpc: Number(j["CPC"]) || 0,
-    featured: j["Featured"] === true || j["Featured"] === "true",
+    featured: isFeatured(j), // ticked AND within the paid Featured-Until window
     datePosted: j["Date Posted"] || "",
     closedDate: j["Closed Date"] || "",
   };

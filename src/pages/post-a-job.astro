@@ -1,0 +1,83 @@
+---
+// src/pages/post-a-job.astro — the employer landing page. Every employer CTA on the
+// site (menu, footer, homepage "feature your job") routes here, and this page is the
+// only place that links out to the paid-submission form. There is no free posting.
+import Base from "../layouts/Base.astro";
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+
+// ---------------------------------------------------------------------------
+//  EDIT ME — the only values you'll need to change live.
+// ---------------------------------------------------------------------------
+// Audience stats shown as tiles. Update these numbers any time.
+const STATS = [
+  { num: "19,000+", label: "visitors a month" },
+  { num: "Half",    label: "of them in the US" },
+  { num: "5,000+",  label: "clicks to apply a month" },
+  { num: "16,000+", label: "newsletter subscribers" },
+];
+// Price shown on the page. PLACEHOLDER — set your real price (e.g. "$99").
+const PRICE = "$99";
+// The "Post your job" button links here. PLACEHOLDER Airtable form URL — replace with
+// your real paid-submission form (the one that redirects to the Stripe Payment Link).
+const POST_JOB_FORM = "https://airtable.com/appN0P6wKR7v0OWyY/pagzsYcFbirqeBZWS/form";
+// ---------------------------------------------------------------------------
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Post a remote HR job — HRJobsRemote",
+  url: `${site}/post-a-job`,
+  description: "Feature your fully remote HR role in front of thousands of HR professionals on HRJobsRemote.",
+};
+---
+<Base
+  title="Post a Remote HR Job — Featured Placement | HRJobsRemote"
+  description="Feature your fully remote HR role on HRJobsRemote — in front of 19,000+ monthly visitors and 16,000+ newsletter subscribers. Hand-reviewed, fully-remote only, full refund if we can't accept it."
+  canonical={`${site}/post-a-job`}
+  schemas={[schema]}
+>
+  <span class="eyebrow">For employers</span>
+  <h1>Hire remote HR talent</h1>
+  <p class="answer">Feature your fully remote HR role in front of thousands of HR professionals.</p>
+
+  <div class="stat-grid">
+    {STATS.map((s) => (
+      <div class="stat"><span class="num">{s.num}</span><span class="lbl">{s.label}</span></div>
+    ))}
+  </div>
+
+  <h2>What you get</h2>
+  <ul class="pj-list">
+    <li>Pinned at the top of HRJobsRemote.com for 30 days.</li>
+    <li>A <b>Featured</b> badge on your listing.</li>
+  </ul>
+
+  <h2>Our promise</h2>
+  <ul class="pj-list">
+    <li>Fully remote HR roles only — no hybrid, no on-site.</li>
+    <li>Every post reviewed by hand within 1 business day.</li>
+    <li>Full refund if we can't accept it.</li>
+  </ul>
+
+  <div class="pj-price">
+    <p class="price-tag">{PRICE}<span> / 30 days</span></p>
+    <a class="post-cta" href={POST_JOB_FORM} target="_blank" rel="noopener">Post your job</a>
+  </div>
+
+  <style>
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.4rem 0 2.2rem; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat .num { font-family: var(--display); font-weight: 800; font-size: 1.7rem; letter-spacing: -0.02em; color: var(--ink); line-height: 1.1; }
+    .stat .lbl { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; color: var(--muted); }
+    @media (min-width: 720px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .pj-list { margin: 0.4rem 0 1.8rem; padding-left: 1.1rem; line-height: 1.7; }
+    .pj-list li { margin: 0.25rem 0; }
+
+    .pj-price { margin: 2.2rem 0 1rem; padding: 1.6rem; background: var(--teal-wash); border: 1px solid color-mix(in srgb, var(--teal) 16%, var(--line)); border-radius: var(--radius); text-align: center; }
+    .price-tag { font-family: var(--display); font-weight: 800; font-size: 2.4rem; letter-spacing: -0.02em; color: var(--ink); margin: 0 0 1.1rem; }
+    .price-tag span { font-family: var(--mono); font-size: 0.9rem; font-weight: 400; color: var(--muted); letter-spacing: 0.02em; }
+    .post-cta { display: inline-block; font-family: var(--display); font-weight: 700; font-size: 1.15rem; color: #fff; background: var(--clay); border-radius: 10px; padding: 0.9rem 2.4rem; text-decoration: none; transition: background 0.15s, transform 0.15s; }
+    .post-cta:hover { background: var(--clay-dark); transform: translateY(-1px); }
+  </style>
+</Base>

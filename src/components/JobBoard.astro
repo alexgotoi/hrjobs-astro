@@ -18,11 +18,10 @@ const {
   placeholders = [],       // example featured cards shown only until a real one exists
 } = Astro.props;
 
-// TODO: point this at your Airtable "Feature a job" form (the paid-placement form).
-// Until payment is wired, this can be the same Add-a-job form with a "Featured?" field,
-// or a Stripe/Gumroad payment link that then emails you the job details. See the note
-// I sent on payment options.
-const FEATURE_JOB_FORM = "https://airtable.com/REPLACE_WITH_YOUR_FEATURE_FORM";
+// Employer CTAs route through the on-site /post-a-job landing page (which is the only
+// place that links out to the paid-submission form). Keep this internal link — don't
+// point it straight at a form.
+const POST_A_JOB = "/post-a-job";
 
 
 const empLabel = { FULL_TIME: "Full-time", PART_TIME: "Part-time", CONTRACTOR: "Contract", INTERN: "Internship" };
@@ -105,7 +104,7 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
   )}
 
   {showFeatureCta && (
-    <a class="feature-cta" href={FEATURE_JOB_FORM} target="_blank" rel="noopener">
+    <a class="feature-cta" href={POST_A_JOB}>
       <span class="feature-cta-text">
         <b>Want your role seen first?</b> Feature your job at the top of the board <b>and in our weekly newsletter to 16,000+ HR professionals</b>.
       </span>
@@ -120,7 +119,7 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
           <CompanyLogo company={j.company} logo={null} size={48} />
           <div class="jb-main">
             <span class="jb-eg">Example listing — this is what a featured job looks like</span>
-            <p class="jb-title"><a class="jb-link" href={FEATURE_JOB_FORM} target="_blank" rel="noopener">{j.title}</a></p>
+            <p class="jb-title"><a class="jb-link" href={POST_A_JOB}>{j.title}</a></p>
             <p class="jb-company">{j.company}</p>
             <div class="jb-tags">
               <span class="tag feat">★ Featured</span>
@@ -130,7 +129,7 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
           </div>
           <div class="jb-meta">
             <span class="jb-date">Example slot</span>
-            <a class="jb-apply" href={FEATURE_JOB_FORM} target="_blank" rel="noopener">Feature your job →</a>
+            <a class="jb-apply" href={POST_A_JOB}>Feature your job →</a>
           </div>
         </li>
       ))}

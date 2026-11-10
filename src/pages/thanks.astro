@@ -1,0 +1,18 @@
+---
+// src/pages/thanks.astro — Stripe redirects here after a successful payment.
+// Uses the normal layout, is noindex, and is intentionally left OUT of the sitemap.
+import Base from "../layouts/Base.astro";
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+---
+<Base
+  title="Payment received — HRJobsRemote"
+  description="Thanks for featuring your job on HRJobsRemote. We'll review it within 1 business day and email you when it's live."
+  canonical={`${site}/thanks`}
+  noindex={true}
+>
+  <span class="eyebrow">Featured job</span>
+  <h1>Payment received, thank you.</h1>
+  <p>We'll review your job within 1 business day and email you as soon as it's live. Your 30 days of featured placement start from that moment.</p>
+  <p>If the role turns out not to be fully remote, we'll let you know and refund you in full.</p>
+  <p class="muted">Questions? Reply to your receipt email.</p>
+</Base>
