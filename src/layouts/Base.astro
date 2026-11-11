@@ -2,7 +2,7 @@
 // src/layouts/Base.astro
 import "../styles/global.css";
 import { organizationSchema, websiteSchema, jsonLd } from "../lib/schema.mjs";
-import { ALL_CATEGORIES, catSlug } from "../lib/util.mjs";
+import { ALL_CATEGORIES, catSlug, excelLink } from "../lib/util.mjs";
 
 const {
   title,
@@ -21,7 +21,8 @@ const ogImage = image || `${site}/og-default.png`;
 
 // External links used in the menu/footer. Employer CTAs now route through the on-site
 // /post-a-job landing page (not straight to a form), so there's no add-a-job form URL here.
-const EXCEL_COURSE = "https://excelforhr.com";
+const EXCEL_MENU = excelLink("menu");
+const EXCEL_FOOTER = excelLink("footer");
 // The newsletter capture BAND posts to our own Netlify function, which adds the email to
 // the EmailOctopus list (netlify/functions/subscribe.mjs; needs EMAILOCTOPUS_API_KEY and
 // EMAILOCTOPUS_LIST_ID set in Netlify). The email field is named "email".
@@ -90,7 +91,7 @@ const NEWSLETTER_URL = "/newsletter";
           <nav class="nav">
             <a href="/resources">Resources</a>
             <a href={NEWSLETTER_URL}>Newsletter</a>
-            <a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR</a>
+            <a href={EXCEL_MENU} target="_blank" rel="noopener">Excel for HR</a>
             <a class="btn-add" href="/post-a-job">Post a job</a>
           </nav>
         </div>
@@ -151,7 +152,7 @@ const NEWSLETTER_URL = "/newsletter";
               <li><a href="/companies">Browse companies</a></li>
               <li><a href="/post-a-job">Post a job (employers)</a></li>
               <li><a href={NEWSLETTER_URL}>Newsletter</a></li>
-              <li><a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR (course)</a></li>
+              <li><a href={EXCEL_FOOTER} target="_blank" rel="noopener">Excel for HR (course)</a></li>
             </ul>
           </div>
         </div>

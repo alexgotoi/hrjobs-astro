@@ -5,7 +5,7 @@ import JobBoard from "../../components/JobBoard.astro";
 import CompanyLogo from "../../components/CompanyLogo.astro";
 import { getJobs } from "../../lib/airtable.mjs";
 import { jobPostingSchema, breadcrumbSchema } from "../../lib/schema.mjs";
-import { catSlug, companySlug, sortJobs } from "../../lib/util.mjs";
+import { catSlug, companySlug, sortJobs, applyHref } from "../../lib/util.mjs";
 
 export async function getStaticPaths() {
   const jobs = await getJobs(); // open + closed (closed stays indexable)
@@ -78,7 +78,7 @@ const schemas = [jobPostingSchema(job, jobUrl), breadcrumbSchema(crumbs)];
       <div class="prose" set:html={job.description} />
       {!job.closed && job.applyUrl && (
         <div class="apply-end">
-          <a class="cta" href={job.applyUrl} rel="nofollow noopener" target="_blank">Apply for this role →</a>
+          <a class="cta" href={applyHref(job, "job_page_top")} rel="nofollow noopener" target="_blank">Apply for this role →</a>
           <p class="cta-note">Opens the employer's site</p>
         </div>
       )}
@@ -102,7 +102,7 @@ const schemas = [jobPostingSchema(job, jobUrl), breadcrumbSchema(crumbs)];
 
       {!job.closed && job.applyUrl && (
         <div>
-          <a class="cta" href={job.applyUrl} rel="nofollow noopener" target="_blank">Apply for this role →</a>
+          <a class="cta" href={applyHref(job, "job_page_bottom")} rel="nofollow noopener" target="_blank">Apply for this role →</a>
           <p class="cta-note">Opens the employer's site</p>
         </div>
       )}

@@ -4,6 +4,7 @@
 // First draft: edit freely.
 import Base from "../layouts/Base.astro";
 import { ORG } from "../lib/schema.mjs";
+import { excelLink } from "../lib/util.mjs";
 
 const site = Astro.site?.toString().replace(/\/$/, "") || "";
 
@@ -50,7 +51,7 @@ const schema = {
 
   <h2>Other things I run</h2>
   <ul class="about-list">
-    <li><a href="https://excelforhr.com" target="_blank" rel="noopener">Excel for HR</a>: a hands-on Excel course for people teams.</li>
+    <li><a href={excelLink("about")} target="_blank" rel="noopener">Excel for HR</a>: a hands-on Excel course for people teams.</li>
     <li><a href="https://hrtoolstack.beehiiv.com/" target="_blank" rel="noopener">HR Tool Stack</a>: a weekly newsletter on HR tools and resources.</li>
     <li><a href="https://alexgotoi.com" target="_blank" rel="noopener">alexgotoi.com</a>: my personal blog.</li>
   </ul>

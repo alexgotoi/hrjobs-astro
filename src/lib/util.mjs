@@ -102,3 +102,47 @@ export const ALL_CATEGORIES = [
   "Diversity and Inclusion",
   "HR Internship",
 ];
+
+// --- UTM tracking on outbound links -------------------------------------------------
+// Tagged: links to our own excelforhr.com, and Apply links on manual / careers-sourced /
+// featured jobs (so employers and our own analytics see the traffic came from here).
+// NEVER tagged: jobs from the XML feeds (WhatJobs / JobLookup) — they are paid per click
+// and their URLs must stay exactly as the feed delivered them.
+export const FEED_SOURCES = ["joblookup", "whatjobs"];
+const FEED_HOSTS = /(^|\.)(whatjobs|joblookup)\./i;
+
+/** Adds utm_* params to an http(s) URL. Leaves the URL untouched if it isn't http(s)
+ *  or already carries utm_source (an employer's own tracking always wins). */
+export function withUtm(url, params) {
+  let u;
+  try { u = new URL(url); } catch { return url; }
+  if (!/^https?:$/.test(u.protocol) || u.searchParams.has("utm_source")) return url;
+  for (const [k, v] of Object.entries(params)) if (v) u.searchParams.set(k, v);
+  return u.toString();
+}
+
+/** True for jobs that came from the XML feeds — by Source, or by the link's domain. */
+export function isFeedJob(job) {
+  if (FEED_SOURCES.includes(String(job.source || "").toLowerCase())) return true;
+  try { return FEED_HOSTS.test(new URL(job.applyUrl).hostname); } catch { return false; }
+}
+
+/** The Apply link to render for a job. `placement` says where on the site it was clicked. */
+export function applyHref(job, placement) {
+  if (!job.applyUrl || isFeedJob(job)) return job.applyUrl;
+  return withUtm(job.applyUrl, {
+    utm_source: "hrjobsremote",
+    utm_medium: "job_board",
+    utm_campaign: job.featured ? "featured_job" : "job_listing",
+    utm_content: placement,
+  });
+}
+
+/** Link to excelforhr.com, tagged with where on the site it sits. */
+export const excelLink = (placement) =>
+  withUtm("https://excelforhr.com/", {
+    utm_source: "hrjobsremote",
+    utm_medium: "referral",
+    utm_campaign: "hrjobsremote_site",
+    utm_content: placement,
+  });

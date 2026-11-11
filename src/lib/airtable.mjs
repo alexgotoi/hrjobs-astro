@@ -16,6 +16,7 @@
  *
  * @typedef {Object} Job
  * @property {string}  sourceId       Unique id from the feed (upsert key); "" for manual jobs.
+ * @property {string}  source         Where the job came from: joblookup | whatjobs (XML feeds) | manual | careers.
  * @property {string}  status         "open" | "closed".
  * @property {boolean} closed         Convenience flag (status === "closed").
  * @property {string}  title          Job title.
@@ -61,7 +62,7 @@ const BASE = import.meta.env.AIRTABLE_BASE_ID || process.env.AIRTABLE_BASE_ID;
 // Website — are deliberately NOT requested, so they can never reach a built page, feed,
 // sitemap or JSON-LD even by accident. "Featured Until" is fetched to drive expiry.
 const JOB_FIELDS = [
-  "Source ID", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
+  "Source ID", "Source", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
   "Company Logo", "City", "State", "Country", "HR Category", "Career Level",
   "Remote Type", "Remote Region", "Employment Type", "CPC", "Featured",
   "Featured Until", "Date Posted", "Closed Date",
@@ -130,6 +131,7 @@ export async function getArticles() {
 function normalizeJob(j) {
   return {
     sourceId: j["Source ID"],
+    source: (j.Source || "").toLowerCase(), // joblookup / whatjobs = XML feeds; manual / careers = ours
     status: j.Status,
     closed: j.Status === "closed",
     title: j.Title || "",
