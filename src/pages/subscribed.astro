@@ -1,0 +1,17 @@
+---
+// src/pages/subscribed.astro — shown after a newsletter signup when the browser has
+// JavaScript turned off (with JS the band confirms in place). noindex, not in the sitemap.
+import Base from "../layouts/Base.astro";
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+---
+<Base
+  title="You're subscribed — HRJobsRemote"
+  description="Thanks for subscribing to the HRJobsRemote newsletter: new remote HR jobs in your inbox every week."
+  canonical={`${site}/subscribed`}
+  noindex={true}
+>
+  <span class="eyebrow">Newsletter</span>
+  <h1>You're subscribed. Thank you!</h1>
+  <p>New remote HR jobs will land in your inbox every week. If you don't see the first issue, check your spam or Promotions folder and mark it as "not spam".</p>
+  <p><a href="/">Browse today's remote HR jobs →</a></p>
+</Base>

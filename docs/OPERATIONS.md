@@ -34,13 +34,14 @@ Actions secrets. Never commit them.
 ## Deploy
 - Host: Vercel, Netlify, or Cloudflare Pages. Build command `npm run build`, output `dist`.
 - Add `AIRTABLE_TOKEN` + `AIRTABLE_BASE_ID` as environment variables.
+- Add `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID` as environment variables (newsletter signup; see `netlify/functions/subscribe.mjs`).
 - Create a **deploy hook** and put its URL in feed-sync's `DEPLOY_HOOK_URL` secret.
 - Point the domain at the host. `public/_redirects` handles the old URL → new URL 301s.
 
 ## Config you edit by hand
 | What | Where |
 |------|-------|
-| Newsletter form endpoint | `NEWSLETTER_ACTION` in `src/layouts/Base.astro` |
+| Newsletter signup (EmailOctopus) | `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID` env vars in Netlify; logic in `netlify/functions/subscribe.mjs` |
 | "Add a job" form URL | `ADD_JOB_FORM` in `src/layouts/Base.astro` |
 | Social profiles (sameAs) | `ORG.sameAs` in `src/lib/schema.mjs` |
 | Add/rename a category | `ALL_CATEGORIES` in `src/lib/util.mjs` **and** `HR_CATEGORIES` in `feed-sync/config.mjs` |
@@ -52,7 +53,8 @@ Actions secrets. Never commit them.
 | A category page 404s | It's not in `ALL_CATEGORIES`, or the slug override is missing in `CATEGORY_SLUG`. |
 | New jobs not appearing | feed-sync didn't run or the deploy hook didn't fire; check the GitHub Actions run and that the job's `Status` is `open`. |
 | A job page has no "Apply" button | The job has no `Apply URL`, or it's closed. |
-| Newsletter form does nothing | `NEWSLETTER_ACTION` is still the placeholder — set your provider's endpoint. |
+| Newsletter form says "temporarily unavailable" | `EMAILOCTOPUS_API_KEY` / `EMAILOCTOPUS_LIST_ID` aren't set in Netlify (redeploy after adding them). |
+| Newsletter form says "Something went wrong" | Check Netlify → Logs → Functions → `subscribe` for the EmailOctopus error (wrong key or list ID). |
 | Build fails on Airtable | Token/base id wrong or lacking scope; the build falls back to mock data only when BOTH are unset. |
 | Social preview image missing | Add `public/og-default.png`. |
 
