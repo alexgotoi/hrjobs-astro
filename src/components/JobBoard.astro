@@ -1,5 +1,6 @@
 ---
 import CompanyLogo from "./CompanyLogo.astro";
+import { applyHref } from "../lib/util.mjs";
 // src/components/JobBoard.astro — Remotive-style listing with client-side
 // filtering (search + category pills + fully-remote toggle + type/level/region
 // dropdowns) and a live job count. Each card links to its dedicated /jobs/[slug]
@@ -157,7 +158,7 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
                 on-site detail page if a job has no apply URL. The "Apply now" button below
                 sits above this overlay and goes to the on-site detail page instead. */}
             <p class="jb-title"><a class="jb-link"
-              href={j.applyUrl || `/jobs/${j.slug}`}
+              href={applyHref(j, "board_card") || `/jobs/${j.slug}`}
               target={j.applyUrl ? "_blank" : undefined}
               rel={j.applyUrl ? "nofollow noopener" : undefined}>{j.title}</a></p>
             <p class="jb-company">{j.company}</p>

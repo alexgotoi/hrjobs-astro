@@ -51,15 +51,25 @@ export default async (req) => {
 
   const source = String(data.source || "website").slice(0, 40).replace(/[^a-z0-9-]/gi, "") || "website";
 
-  try {
-    const res = await fetch(`${API}/lists/${list}/contacts`, {
+  // The create endpoint takes tags as an array of strings (the upsert endpoint uses an object).
+  const create = (body) =>
+    fetch(`${API}/lists/${list}/contacts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ email_address: email, status: "subscribed", tags: { [source]: true } }),
+      body: JSON.stringify(body),
     });
-    if (res.ok) return reply(true, "Thanks! You're subscribed. Watch your inbox for the next issue.");
+  const OK = "Thanks! You're subscribed. Watch your inbox for the next issue.";
+
+  try {
+    let res = await create({ email_address: email, status: "subscribed", tags: [source] });
+    // If EmailOctopus ever rejects the tag itself (400/422), still subscribe the person, untagged.
+    if (res.status === 400 || res.status === 422) {
+      console.error("subscribe: rejected with tag, retrying without", res.status, (await res.text()).slice(0, 300));
+      res = await create({ email_address: email, status: "subscribed" });
+    }
+    if (res.ok) return reply(true, OK);
     // 409 = already on the list. Treat as success, and don't reveal anything about the address.
-    if (res.status === 409) return reply(true, "Thanks! You're subscribed. Watch your inbox for the next issue.");
+    if (res.status === 409) return reply(true, OK);
     console.error("subscribe: EmailOctopus responded", res.status, (await res.text()).slice(0, 300));
     return reply(false, "Something went wrong. Please try again.", 502);
   } catch (err) {

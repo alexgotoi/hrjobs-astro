@@ -41,6 +41,8 @@ Actions secrets. Never commit them.
 ## Config you edit by hand
 | What | Where |
 |------|-------|
+| State-restricted remote jobs | Left out of the build by `src/lib/restrictions.mjs` (title + description rules). Manual/featured jobs are never filtered. |
+| UTM tags on outbound links | `withUtm` / `applyHref` / `excelLink` in `src/lib/util.mjs`. Feed jobs (Source = joblookup/whatjobs, or a whatjobs/joblookup link) are never tagged. |
 | Newsletter page: past issues | Append `{ number, date, title, url }` to `src/data/newsletter-issues.json` (url = the issue's EmailOctopus web version) |
 | Newsletter page: Passionfroot link + stats | `PASSIONFROOT_URL` and `STATS` at the top of `src/pages/newsletter.astro` |
 | Newsletter signup (EmailOctopus) | `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID` env vars in Netlify; logic in `netlify/functions/subscribe.mjs` |

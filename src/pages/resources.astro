@@ -1,6 +1,7 @@
 ---
 // src/pages/resources.astro — the Resources hub: salary guides, collections, articles.
 import Base from "../layouts/Base.astro";
+import { excelLink } from "../lib/util.mjs";
 import { getArticles } from "../lib/airtable.mjs";
 import { buildCollections } from "../lib/collections.mjs";
 import { getJobs } from "../lib/airtable.mjs";
@@ -20,7 +21,7 @@ const schema = {
   description: "Remote HR salary guides, curated job collections, and career articles for HR professionals.",
 };
 
-const EXCEL_COURSE = "https://excelforhr.com";
+const EXCEL_COURSE = excelLink("resources");
 const cards = [
   { href: "/salary-guides", label: salaryCount ? `${salaryCount} guide${salaryCount === 1 ? "" : "s"}` : "Guides", title: "HR Remote Salary Guides", desc: "What remote HR roles pay — salary ranges and benchmarks for recruiters, HRBPs, people-ops and more." },
   { href: "/collections", label: `${collections.length} collections`, title: "Remote HR Job Collections", desc: "Curated groupings of remote HR jobs — entry-level, leadership, work-from-anywhere and more." },

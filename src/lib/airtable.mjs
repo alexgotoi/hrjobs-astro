@@ -16,6 +16,7 @@
  *
  * @typedef {Object} Job
  * @property {string}  sourceId       Unique id from the feed (upsert key); "" for manual jobs.
+ * @property {string}  source         Where the job came from: joblookup | whatjobs (XML feeds) | manual | careers.
  * @property {string}  status         "open" | "closed".
  * @property {boolean} closed         Convenience flag (status === "closed").
  * @property {string}  title          Job title.
@@ -50,6 +51,7 @@
  * @property {{q:string,a:string}[]} faq  Parsed from the Airtable FAQ text field.
  */
 import mockJobs from "../data/mock-jobs.json";
+import { stateRestriction } from "./restrictions.mjs";
 import mockArticles from "../data/mock-articles.json";
 
 // Credentials come from the environment (never commit them). Absent → mock mode.
@@ -61,7 +63,7 @@ const BASE = import.meta.env.AIRTABLE_BASE_ID || process.env.AIRTABLE_BASE_ID;
 // Website — are deliberately NOT requested, so they can never reach a built page, feed,
 // sitemap or JSON-LD even by accident. "Featured Until" is fetched to drive expiry.
 const JOB_FIELDS = [
-  "Source ID", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
+  "Source ID", "Source", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
   "Company Logo", "City", "State", "Country", "HR Category", "Career Level",
   "Remote Type", "Remote Region", "Employment Type", "CPC", "Featured",
   "Featured Until", "Date Posted", "Closed Date",
@@ -113,10 +115,19 @@ export async function getJobs() {
   // Publishing safety: only approved jobs are ever built. Paid submissions arrive with
   // Status blank and are excluded here until you set Status = "open". (Closed jobs are
   // kept on purpose as indexable "[Closed]" pages; callers hide them from live listings.)
-  return rows
+  // Remote rule: state-specific remote jobs are not listed. Applies to feed and careers
+  // jobs only; manual/featured jobs are checked by hand (see src/lib/restrictions.mjs).
+  const jobs = rows
     .filter((j) => j.Status === "open" || j.Status === "closed")
     .map(normalizeJob);
+  const kept = jobs.filter((j) => j.source === "manual" || j.featured || !stateRestriction(j.title, j.description));
+  if (!loggedRestricted && kept.length < jobs.length) {
+    loggedRestricted = true;
+    console.log(`[jobs] left out ${jobs.length - kept.length} state-restricted remote job(s)`);
+  }
+  return kept;
 }
+let loggedRestricted = false;
 
 /**
  * All published blog articles.
@@ -130,6 +141,7 @@ export async function getArticles() {
 function normalizeJob(j) {
   return {
     sourceId: j["Source ID"],
+    source: (j.Source || "").toLowerCase(), // joblookup / whatjobs = XML feeds; manual / careers = ours
     status: j.Status,
     closed: j.Status === "closed",
     title: j.Title || "",
