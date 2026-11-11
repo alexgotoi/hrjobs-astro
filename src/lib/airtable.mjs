@@ -51,6 +51,7 @@
  * @property {{q:string,a:string}[]} faq  Parsed from the Airtable FAQ text field.
  */
 import mockJobs from "../data/mock-jobs.json";
+import { stateRestriction } from "./restrictions.mjs";
 import mockArticles from "../data/mock-articles.json";
 
 // Credentials come from the environment (never commit them). Absent → mock mode.
@@ -114,10 +115,19 @@ export async function getJobs() {
   // Publishing safety: only approved jobs are ever built. Paid submissions arrive with
   // Status blank and are excluded here until you set Status = "open". (Closed jobs are
   // kept on purpose as indexable "[Closed]" pages; callers hide them from live listings.)
-  return rows
+  // Remote rule: state-specific remote jobs are not listed. Applies to feed and careers
+  // jobs only; manual/featured jobs are checked by hand (see src/lib/restrictions.mjs).
+  const jobs = rows
     .filter((j) => j.Status === "open" || j.Status === "closed")
     .map(normalizeJob);
+  const kept = jobs.filter((j) => j.source === "manual" || j.featured || !stateRestriction(j.title, j.description));
+  if (!loggedRestricted && kept.length < jobs.length) {
+    loggedRestricted = true;
+    console.log(`[jobs] left out ${jobs.length - kept.length} state-restricted remote job(s)`);
+  }
+  return kept;
 }
+let loggedRestricted = false;
 
 /**
  * All published blog articles.
