@@ -24,7 +24,6 @@
 # --- Utility / deprecated pages ---
 /add-job      /post-a-job   301!
 /checkout     /   301
-/newsletter   /   301   # or point to your newsletter provider's signup URL
 /job-details      /   301   # old Softr job template
 /job-details/*    /   301   # individual jobs were /job-details?recordId=... (now ephemeral)
 
@@ -39,5 +38,5 @@
 #   remote-diversity-and-inclusion-jobs, remote-people-analytics-jobs,
 #   remote-hr-internships
 #
-# /about — create an About page (recommended) instead of redirecting.
+# /about — served by src/pages/about.astro (no redirect needed).
 # ============================================================================

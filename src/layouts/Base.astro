@@ -22,12 +22,12 @@ const ogImage = image || `${site}/og-default.png`;
 // External links used in the menu/footer. Employer CTAs now route through the on-site
 // /post-a-job landing page (not straight to a form), so there's no add-a-job form URL here.
 const EXCEL_COURSE = "https://excelforhr.com";
-// TODO: the newsletter capture BAND posts emails to this endpoint (your provider's form
-// "action" URL — Beehiiv/MailerLite/etc. The email field is named "email").
-const NEWSLETTER_ACTION = "https://YOUR-NEWSLETTER-PROVIDER/subscribe";
-// TODO: the "Newsletter" menu BUTTON links here — your public newsletter page (the Beehiiv
-// publication URL once you move there, e.g. https://hrjobsremote.beehiiv.com).
-const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
+// The newsletter capture BAND posts to our own Netlify function, which adds the email to
+// the EmailOctopus list (netlify/functions/subscribe.mjs; needs EMAILOCTOPUS_API_KEY and
+// EMAILOCTOPUS_LIST_ID set in Netlify). The email field is named "email".
+const NEWSLETTER_ACTION = "/api/subscribe";
+// The "Newsletter" menu/footer links go to the newsletter page (src/pages/newsletter.astro).
+const NEWSLETTER_URL = "/newsletter";
 ---
 <!doctype html>
 <html lang="en">
@@ -70,6 +70,10 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
       href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap"
     />
 
+    <!-- Fathom Analytics (privacy-friendly, no cookie banner needed). Counts only the real
+         domain, so Netlify preview builds don't pollute the stats. -->
+    <script is:inline src="https://cdn.usefathom.com/script.js" data-site="KMZHZQYY" data-included-domains="www.hrjobsremote.com,hrjobsremote.com" defer></script>
+
     <!-- Sitewide schema: Organization + WebSite (enables a search box in Google) -->
     <script type="application/ld+json" set:html={jsonLd(organizationSchema())} />
     <script type="application/ld+json" set:html={jsonLd(websiteSchema())} />
@@ -85,7 +89,7 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
           <a class="brand" href="/">HRJobs<b>Remote</b></a>
           <nav class="nav">
             <a href="/resources">Resources</a>
-            <a href={NEWSLETTER_URL} target="_blank" rel="noopener">Newsletter</a>
+            <a href={NEWSLETTER_URL}>Newsletter</a>
             <a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR</a>
             <a class="btn-add" href="/post-a-job">Post a job</a>
           </nav>
@@ -93,17 +97,19 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
       </div>
     </header>
 
-    <section class="nl-band" aria-label="Remote HR jobs newsletter">
+    <section class="nl-band" id="subscribe" aria-label="Remote HR jobs newsletter">
       <div class={`wrap wrap-wide nl-wrap ${Astro.slots.has("hero") ? "nl-has-hero" : ""}`}>
         {Astro.slots.has("hero") && <div class="nl-hero"><slot name="hero" /></div>}
         <div class="nl-inner">
           <p class="nl-proof">Join <b>16,000+</b> HR professionals getting new remote jobs <b>every week</b></p>
           <div class="nl-cta">
-            <form class="nl-form" action={NEWSLETTER_ACTION} method="post" target="_blank" rel="noopener">
-              <input type="email" name="email" required placeholder="Your email" aria-label="Email address" />
+            <form class="nl-form" action={NEWSLETTER_ACTION} method="post">
+              <input type="email" name="email" required placeholder="Your email" aria-label="Email address" autocomplete="email" />
+              <!-- honeypot: hidden from people, bots fill it in -->
+              <input type="text" name="company" class="nl-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
               <button type="submit">Subscribe</button>
             </form>
-            <span class="nl-note">No spam. Unsubscribe anytime.</span>
+            <span class="nl-note" role="status" aria-live="polite">No spam. Unsubscribe anytime.</span>
           </div>
         </div>
       </div>
@@ -141,9 +147,10 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
             <h4>More</h4>
             <ul>
               <li><a href="/">All remote HR jobs</a></li>
+              <li><a href="/about">About</a></li>
               <li><a href="/companies">Browse companies</a></li>
               <li><a href="/post-a-job">Post a job (employers)</a></li>
-              <li><a href={NEWSLETTER_URL} target="_blank" rel="noopener">Newsletter</a></li>
+              <li><a href={NEWSLETTER_URL}>Newsletter</a></li>
               <li><a href={EXCEL_COURSE} target="_blank" rel="noopener">Excel for HR (course)</a></li>
             </ul>
           </div>
@@ -161,6 +168,29 @@ const NEWSLETTER_URL = "https://YOUR-NEWSLETTER-PAGE";
         set();
         window.addEventListener("resize", set);
       })();
+
+      // Newsletter band: submit in place (no page change) and confirm under the form.
+      // Without JS the form still posts normally and lands on /subscribed.
+      document.querySelectorAll(".nl-form").forEach(function (form, i) {
+        var note = form.parentElement.querySelector(".nl-note");
+        if (!note || !window.fetch) return;
+        var show = function (msg, state) { note.textContent = msg; note.setAttribute("data-state", state); };
+        if (i === 0 && /[?&]subscribe=error/.test(location.search)) show("Something went wrong. Please try again.", "error");
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var btn = form.querySelector("button");
+          btn.disabled = true;
+          show("Subscribing…", "busy");
+          fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: new FormData(form) })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              show(d.message, d.ok ? "ok" : "error");
+              if (d.ok) form.reset();
+            })
+            .catch(function () { show("Something went wrong. Please try again.", "error"); })
+            .finally(function () { btn.disabled = false; });
+        });
+      });
     </script>
   </body>
 </html>

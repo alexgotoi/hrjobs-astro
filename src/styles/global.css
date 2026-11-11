@@ -74,6 +74,10 @@ a:hover { text-decoration-thickness: 2px; }
 .nl-form button { font-family: var(--display); font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; color: #fff; background: var(--clay); border: 0; border-radius: 8px; padding: 0.5rem 1.1rem; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
 .nl-form button:hover { background: var(--clay-dark); }
 .nl-note { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.02em; color: #8f99b3; }
+.nl-note[data-state="ok"] { color: #8fe0c8; font-size: 0.8rem; }
+.nl-note[data-state="error"] { color: #ffb4a0; font-size: 0.8rem; }
+.nl-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
+.nl-band { scroll-margin-top: var(--header-h, 64px); }
 
 /* homepage hero */
 .nl-hero h1 { color: #fff; margin: 0 0 0.6rem; }

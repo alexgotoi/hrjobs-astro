@@ -19,7 +19,7 @@ No environment variables required to run — it falls back to `src/data/mock-*.j
 1. Set `AIRTABLE_TOKEN` and `AIRTABLE_BASE_ID` in your host.
 2. Deploy (`npm run build`, output `dist/`) to Vercel / Netlify / Cloudflare Pages.
 3. Create a deploy hook; put its URL in feed-sync's `DEPLOY_HOOK_URL`.
-4. Fill the `TODO`s: `NEWSLETTER_ACTION` + `ADD_JOB_FORM` (`src/layouts/Base.astro`),
+4. Set `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID` (newsletter signup). Fill the `TODO`s:
    `ORG.sameAs` (`src/lib/schema.mjs`), and `public/logo.png` + `public/og-default.png`.
 5. Submit `/sitemap.xml` to Google Search Console and Bing Webmaster Tools.
 

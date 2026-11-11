@@ -68,6 +68,7 @@ ${categoryLines}
 - [HR career guides](${base}/blog): Articles on remote HR careers, salaries, and job search.
 - [HR career resources](${base}/resources): Salary guides, job collections, and articles.
 - [Remote HR salary guides](${base}/salary-guides): What remote HR roles pay, by specialism.
+- [Newsletter](${base}/newsletter): Free weekly email with ~30 hand-picked remote HR jobs, plus past issues.
 
 ## Curated job collections
 ${collectionLines || "- Curated collections are published as jobs are added."}
