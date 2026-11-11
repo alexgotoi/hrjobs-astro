@@ -70,6 +70,10 @@ const NEWSLETTER_URL = "/newsletter";
       href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap"
     />
 
+    <!-- Fathom Analytics (privacy-friendly, no cookie banner needed). Counts only the real
+         domain, so Netlify preview builds don't pollute the stats. -->
+    <script is:inline src="https://cdn.usefathom.com/script.js" data-site="KMZHZQYY" data-included-domains="www.hrjobsremote.com,hrjobsremote.com" defer></script>
+
     <!-- Sitewide schema: Organization + WebSite (enables a search box in Google) -->
     <script type="application/ld+json" set:html={jsonLd(organizationSchema())} />
     <script type="application/ld+json" set:html={jsonLd(websiteSchema())} />
