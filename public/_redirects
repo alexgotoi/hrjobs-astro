@@ -24,7 +24,6 @@
 # --- Utility / deprecated pages ---
 /add-job      /post-a-job   301!
 /checkout     /   301
-/newsletter   /#subscribe   301   # the signup band on every page
 /job-details      /   301   # old Softr job template
 /job-details/*    /   301   # individual jobs were /job-details?recordId=... (now ephemeral)
 

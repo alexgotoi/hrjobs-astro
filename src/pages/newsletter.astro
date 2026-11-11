@@ -1,0 +1,195 @@
+---
+// src/pages/newsletter.astro — the newsletter's home: subscribe, what's inside, the archive
+// of past issues, and the sponsorship pitch. The heading sits inside the shared navy
+// newsletter band (the "hero" slot), so the page opens with the signup form.
+import Base from "../layouts/Base.astro";
+import Faq from "../components/Faq.astro";
+import { faqSchema } from "../lib/schema.mjs";
+import issues from "../data/newsletter-issues.json";
+
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+
+// ---------------------------------------------------------------------------
+//  EDIT ME
+// ---------------------------------------------------------------------------
+// Your Passionfroot storefront. TODO: replace with your real storefront URL.
+const PASSIONFROOT_URL = "https://www.passionfroot.me/YOUR-STOREFRONT";
+// Audience numbers shown to readers and sponsors. Update any time.
+const STATS = [
+  { num: "16,000+", label: "subscribers" },
+  { num: "~50%",    label: "average open rate" },
+  { num: "Weekly",  label: "one email, ~30 jobs" },
+  { num: "2019",    label: "sending since" },
+];
+// Past issues are listed from src/data/newsletter-issues.json, newest first. To add an
+// issue, append: { "number": 1, "date": "2026-11-18", "title": "…", "url": "<EmailOctopus web version link>" }
+// ---------------------------------------------------------------------------
+
+const SECTIONS = [
+  "Recruiting & Talent Acquisition",
+  "People Ops & HR Generalist",
+  "HR Business Partner",
+  "HR Tech, HRIS & People Analytics",
+  "Comp & Benefits, L&D & more",
+];
+
+const past = [...issues].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+const fmt = (d) => new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+const faq = [
+  { q: "How often is the HRJobsRemote newsletter sent?", a: "Once a week, with around 30 new remote HR jobs." },
+  { q: "Is the newsletter free?", a: "Yes. Each issue can carry one clearly marked sponsor, which keeps it free for readers." },
+  { q: "Which countries are the jobs open to?", a: "Worldwide, the US, Canada, the UK, Europe, LATAM and APAC. Every job lists where you can work from, so you can skip the ones that don't fit." },
+  { q: "Do you include hybrid roles?", a: "No. If a role expects any time in the office, it doesn't make the list." },
+  { q: "How do I unsubscribe?", a: "Every email has a one-click unsubscribe link at the bottom." },
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "HRJobsRemote newsletter — weekly remote HR jobs",
+  url: `${site}/newsletter`,
+  description: "A free weekly email with around 30 hand-picked, fully remote HR jobs, read by 16,000+ HR professionals.",
+};
+---
+<Base
+  title="Remote HR Jobs Newsletter — 30 Hand-Picked Jobs Weekly | HRJobsRemote"
+  description="A free weekly email with around 30 hand-picked, fully remote HR jobs: recruiting, HRBP, people ops, HR tech, comp & benefits and L&D. Join 16,000+ HR professionals."
+  canonical={`${site}/newsletter`}
+  schemas={[schema, faqSchema(faq)]}
+  wide={true}
+>
+  <Fragment slot="hero">
+    <h1>30 hand-picked remote HR jobs, every week</h1>
+    <p class="nl-lede">A free weekly email for HR professionals. Every role fully remote: no hybrid, no "remote but three days in the office."</p>
+  </Fragment>
+
+  <div class="nlp">
+    <div class="stat-grid">
+      {STATS.map((s) => (
+        <div class="stat"><span class="num">{s.num}</span><span class="lbl">{s.label}</span></div>
+      ))}
+    </div>
+
+    <section aria-labelledby="why">
+      <span class="eyebrow">Why HR people subscribe</span>
+      <h2 id="why">The remote HR roles worth your time, without scrolling ten job boards</h2>
+      <div class="why-grid">
+        <div class="why"><span class="n">01</span><h3>Fully remote only</h3><p>We drop hybrid roles and anything that expects office days. Each job shows where you can work from.</p></div>
+        <div class="why"><span class="n">02</span><h3>Every HR domain</h3><p>Five sections, so you can skim straight to your field.</p></div>
+        <div class="why"><span class="n">03</span><h3>Picked, not scraped</h3><p>Roles from company career pages and trusted job boards, checked before they go out.</p></div>
+        <div class="why"><span class="n">04</span><h3>Free, once a week</h3><p>One email. No paywall, no daily noise. Leave whenever you like.</p></div>
+      </div>
+    </section>
+
+    <section class="sections-box" aria-labelledby="sections">
+      <span class="eyebrow" id="sections">The five sections in every issue</span>
+      <ul class="chips">
+        {SECTIONS.map((s) => <li>{s}</li>)}
+      </ul>
+    </section>
+
+    <section aria-labelledby="archive">
+      <span class="eyebrow">Archive</span>
+      <h2 id="archive">Past issues</h2>
+      {past.length > 0 ? (
+        <ul class="issues">
+          {past.map((i) => (
+            <li>
+              <a href={i.url} target="_blank" rel="noopener">
+                <span class="i-num">#{i.number}</span>
+                <span class="i-title">{i.title}</span>
+                <span class="i-date">{fmt(i.date)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty">
+          <p><b>The archive starts with the next issue.</b> We've just moved to a new format, and every issue from now on will be listed here.</p>
+          <p><a href="#subscribe">Subscribe</a> so the first one lands in your inbox.</p>
+        </div>
+      )}
+    </section>
+
+    <section class="sponsor" aria-labelledby="sponsor">
+      <span class="eyebrow">For brands</span>
+      <h2 id="sponsor">Sponsor the newsletter</h2>
+      <p>Put your product in front of 16,000+ HR professionals: recruiters, HR business partners, people-ops, HRIS, comp &amp; benefits and L&amp;D people.</p>
+      <ul class="sp-list">
+        <li>One sponsor per issue, placed at the top, above the jobs.</li>
+        <li>A good fit for HR software, payroll and global-hiring platforms, HR courses and certifications, and career tools.</li>
+        <li>Book and pay online through our storefront. No calls needed.</li>
+      </ul>
+      <div class="sp-actions">
+        <a class="sp-cta" href={PASSIONFROOT_URL} target="_blank" rel="noopener">See sponsorship options</a>
+        <a class="sp-alt" href="/post-a-job">Hiring instead? Post a featured job →</a>
+      </div>
+    </section>
+
+    <Faq items={faq} heading="Newsletter FAQ" />
+
+    <section class="final" aria-label="Subscribe">
+      <div>
+        <h2>Get next week's jobs</h2>
+        <p>Free. Join 16,000+ HR professionals.</p>
+      </div>
+      <div class="nl-cta final-cta">
+        <form class="nl-form" action="/api/subscribe" method="post">
+          <input type="email" name="email" required placeholder="Your email" aria-label="Email address" autocomplete="email" />
+          <input type="text" name="company" class="nl-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input type="hidden" name="source" value="newsletter-page" />
+          <button type="submit">Subscribe</button>
+        </form>
+        <span class="nl-note" role="status" aria-live="polite">No spam. Unsubscribe anytime.</span>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .nlp { max-width: none; }
+    .nlp section { margin: 2.6rem 0; }
+    .nlp h2 { margin-top: 0.2rem; }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.6rem 0 0.4rem; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat .num { font-family: var(--display); font-weight: 800; font-size: 1.7rem; letter-spacing: -0.02em; color: var(--ink); line-height: 1.1; }
+    .stat .lbl { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; color: var(--muted); }
+    @media (min-width: 720px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .why-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 1.1rem; }
+    @media (min-width: 640px) { .why-grid { grid-template-columns: 1fr 1fr; } }
+    .why { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.2rem 1.3rem; }
+    .why .n { font-family: var(--mono); font-size: 0.75rem; color: var(--clay-dark); }
+    .why h3 { margin: 0.3rem 0 0.35rem; }
+    .why p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .sections-box { background: var(--teal-wash); border-radius: var(--radius); padding: 1.3rem 1.4rem; }
+    .chips { list-style: none; padding: 0; margin: 0.4rem 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    .chips li { background: var(--card); border-radius: 999px; padding: 0.45rem 0.95rem; font-weight: 600; font-size: 0.95rem; }
+
+    .issues { list-style: none; padding: 0; margin: 1rem 0 0; border-top: 1px solid var(--line); }
+    .issues li a { display: flex; gap: 1rem; align-items: baseline; padding: 0.85rem 0.2rem; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); }
+    .issues li a:hover .i-title { color: var(--teal); }
+    .i-num { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); min-width: 3.2rem; }
+    .i-title { flex: 1; font-weight: 600; }
+    .i-date { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+    .empty { margin-top: 1rem; border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 1.2rem 1.3rem; background: var(--card); }
+    .empty p { margin: 0.2rem 0; }
+
+    .sponsor { background: var(--ink); color: #fff; border-radius: 16px; padding: 1.8rem 1.6rem; }
+    .sponsor .eyebrow { color: #aab3c9; }
+    .sponsor h2 { color: #fff; }
+    .sponsor p, .sp-list { color: #d5dbe8; }
+    .sp-list { padding-left: 1.1rem; line-height: 1.7; margin: 0.6rem 0 1.4rem; }
+    .sp-actions { display: flex; flex-wrap: wrap; gap: 0.8rem 1.4rem; align-items: center; }
+    .sp-cta { display: inline-block; font-family: var(--display); font-weight: 700; color: #fff; background: var(--clay); border-radius: 10px; padding: 0.8rem 1.6rem; text-decoration: none; }
+    .sp-cta:hover { background: var(--clay-dark); }
+    .sp-alt { color: #8fe0c8; }
+
+    .final { background: var(--ink); border-radius: 16px; padding: 1.6rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; }
+    .final h2 { color: #fff; margin: 0 0 0.3rem; }
+    .final p { color: #d5dbe8; margin: 0; }
+    .final-cta { align-items: stretch; }
+  </style>
+</Base>

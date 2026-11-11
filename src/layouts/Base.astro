@@ -26,8 +26,8 @@ const EXCEL_COURSE = "https://excelforhr.com";
 // the EmailOctopus list (netlify/functions/subscribe.mjs; needs EMAILOCTOPUS_API_KEY and
 // EMAILOCTOPUS_LIST_ID set in Netlify). The email field is named "email".
 const NEWSLETTER_ACTION = "/api/subscribe";
-// The "Newsletter" menu/footer links jump to that band (it's on every page).
-const NEWSLETTER_URL = "#subscribe";
+// The "Newsletter" menu/footer links go to the newsletter page (src/pages/newsletter.astro).
+const NEWSLETTER_URL = "/newsletter";
 ---
 <!doctype html>
 <html lang="en">
@@ -166,12 +166,11 @@ const NEWSLETTER_URL = "#subscribe";
 
       // Newsletter band: submit in place (no page change) and confirm under the form.
       // Without JS the form still posts normally and lands on /subscribed.
-      (function () {
-        var form = document.querySelector(".nl-form");
-        var note = document.querySelector(".nl-band .nl-note");
-        if (!form || !note || !window.fetch) return;
+      document.querySelectorAll(".nl-form").forEach(function (form, i) {
+        var note = form.parentElement.querySelector(".nl-note");
+        if (!note || !window.fetch) return;
         var show = function (msg, state) { note.textContent = msg; note.setAttribute("data-state", state); };
-        if (/[?&]subscribe=error/.test(location.search)) show("Something went wrong. Please try again.", "error");
+        if (i === 0 && /[?&]subscribe=error/.test(location.search)) show("Something went wrong. Please try again.", "error");
         form.addEventListener("submit", function (e) {
           e.preventDefault();
           var btn = form.querySelector("button");
@@ -186,7 +185,7 @@ const NEWSLETTER_URL = "#subscribe";
             .catch(function () { show("Something went wrong. Please try again.", "error"); })
             .finally(function () { btn.disabled = false; });
         });
-      })();
+      });
     </script>
   </body>
 </html>

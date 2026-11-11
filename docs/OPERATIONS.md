@@ -41,6 +41,8 @@ Actions secrets. Never commit them.
 ## Config you edit by hand
 | What | Where |
 |------|-------|
+| Newsletter page: past issues | Append `{ number, date, title, url }` to `src/data/newsletter-issues.json` (url = the issue's EmailOctopus web version) |
+| Newsletter page: Passionfroot link + stats | `PASSIONFROOT_URL` and `STATS` at the top of `src/pages/newsletter.astro` |
 | Newsletter signup (EmailOctopus) | `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID` env vars in Netlify; logic in `netlify/functions/subscribe.mjs` |
 | "Add a job" form URL | `ADD_JOB_FORM` in `src/layouts/Base.astro` |
 | Social profiles (sameAs) | `ORG.sameAs` in `src/lib/schema.mjs` |

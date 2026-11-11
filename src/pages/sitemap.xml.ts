@@ -20,6 +20,7 @@ export async function GET({ site }) {
     { loc: `${base}/companies` },
     { loc: `${base}/resources` },
     { loc: `${base}/post-a-job` },
+    { loc: `${base}/newsletter` },
     { loc: `${base}/salary-guides` },
     { loc: `${base}/collections` },
     ...landing.map((p) => ({ loc: `${base}/${p.slug}`, lastmod: p.lastmod || undefined })),
