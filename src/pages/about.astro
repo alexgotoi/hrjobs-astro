@@ -1,0 +1,65 @@
+---
+// src/pages/about.astro — who runs HRJobsRemote and how the jobs are picked.
+// /about is an old ranking URL from the Softr site, so it needs a real page.
+// First draft: edit freely.
+import Base from "../layouts/Base.astro";
+import { ORG } from "../lib/schema.mjs";
+
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+
+const person = {
+  "@type": "Person",
+  name: "Alex Goțoi",
+  jobTitle: "Founder, HRJobsRemote",
+  address: { "@type": "PostalAddress", addressLocality: "Bucharest", addressCountry: "RO" },
+  knowsAbout: ["HR technology", "SAP SuccessFactors", "HR process automation", "Remote work", "Recruiting"],
+  url: "https://alexgotoi.com",
+};
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  name: "About HRJobsRemote",
+  url: `${site}/about`,
+  mainEntity: { "@type": "Organization", name: ORG.name, url: ORG.url, foundingDate: ORG.foundingDate, founder: person, sameAs: ORG.sameAs },
+};
+---
+<Base
+  title="About HRJobsRemote — Remote Jobs for HR Professionals Since 2019"
+  description="HRJobsRemote is a remote job board for HR professionals, run since 2019 by Alex Goțoi, an HR technology specialist based in Bucharest. Here's how we pick the jobs."
+  canonical={`${site}/about`}
+  schemas={[schema]}
+>
+  <span class="eyebrow">About</span>
+  <h1>A job board by an HR person, for HR people</h1>
+  <p class="answer">HRJobsRemote lists fully remote jobs for HR professionals: recruiters, HR business partners, people operations, HR tech, comp &amp; benefits, L&amp;D and more. It has been running since 2019.</p>
+
+  <h2>Who's behind it</h2>
+  <p>Hi, I'm Alex Goțoi. I work in HR technology, based in Bucharest, Romania. Most of my career has been spent on enterprise HR systems: SAP SuccessFactors, HR process automation and integrations between HR platforms.</p>
+  <p>I started HRJobsRemote in 2019 because good remote HR roles were hard to find. They were scattered across general job boards and buried under hybrid and office-based listings. I wanted one place where HR people could find roles they can genuinely do from anywhere.</p>
+
+  <h2>How the jobs are picked</h2>
+  <ul class="about-list">
+    <li><b>Fully remote only.</b> If a role expects any time in the office, it doesn't make the list.</li>
+    <li><b>HR roles only.</b> Every job is sorted into one of 16 HR categories, from recruiting to HRIS.</li>
+    <li><b>Clear about location.</b> Each job shows where you can work from: worldwide, a region, or a specific country.</li>
+    <li><b>From trusted sources.</b> Jobs come from established job feeds and straight from company career pages, and closed roles are removed.</li>
+  </ul>
+
+  <h2>How the site is funded</h2>
+  <p>Browsing jobs and the weekly newsletter are free. The site is funded by employers who feature their roles, by newsletter sponsors, and by some job listings that pay us when you click through. Featured roles are always clearly marked, and they're reviewed by hand to make sure they're fully remote.</p>
+
+  <h2>Other things I run</h2>
+  <ul class="about-list">
+    <li><a href="https://excelforhr.com" target="_blank" rel="noopener">Excel for HR</a>: a hands-on Excel course for people teams.</li>
+    <li><a href="https://hrtoolstack.beehiiv.com/" target="_blank" rel="noopener">HR Tool Stack</a>: a weekly newsletter on HR tools and resources.</li>
+    <li><a href="https://alexgotoi.com" target="_blank" rel="noopener">alexgotoi.com</a>: my personal blog.</li>
+  </ul>
+
+  <h2>Stay in touch</h2>
+  <p>Get new remote HR jobs every week in the <a href="/newsletter">newsletter</a>, follow <a href="https://www.linkedin.com/company/hrjobsremote/" target="_blank" rel="noopener">HRJobsRemote on LinkedIn</a>, or, if you're hiring, <a href="/post-a-job">post a job</a>.</p>
+
+  <style>
+    .about-list { padding-left: 1.1rem; line-height: 1.7; }
+    .about-list li { margin: 0.3rem 0; }
+  </style>
+</Base>

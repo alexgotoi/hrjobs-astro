@@ -38,5 +38,5 @@
 #   remote-diversity-and-inclusion-jobs, remote-people-analytics-jobs,
 #   remote-hr-internships
 #
-# /about — create an About page (recommended) instead of redirecting.
+# /about — served by src/pages/about.astro (no redirect needed).
 # ============================================================================

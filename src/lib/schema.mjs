@@ -13,15 +13,13 @@ import { isFullyRemote, isHybrid } from "./util.mjs";
 export const ORG = {
   name: "HRJobsRemote",
   url: "https://www.hrjobsremote.com",
-  logo: "https://www.hrjobsremote.com/logo.png", // TODO: set your real logo URL
+  logo: "https://www.hrjobsremote.com/logo.png",
   description:
     "Curated remote job board for HR professionals — recruiters, HR business partners, " +
     "people operations, L&D and more. Hand-picked remote-friendly HR roles, updated daily, since 2019.",
   foundingDate: "2019",
   sameAs: [
-    // TODO: add your real profiles, e.g.
-    // "https://www.linkedin.com/company/hrjobsremote",
-    // "https://x.com/hrjobsremote",
+    "https://www.linkedin.com/company/hrjobsremote/",
   ],
 };
 
