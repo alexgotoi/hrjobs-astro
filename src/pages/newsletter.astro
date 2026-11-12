@@ -22,7 +22,7 @@ const STATS = [
   { num: "2019",    label: "sending since" },
 ];
 // Past issues are listed from src/data/newsletter-issues.json, newest first. To add an
-// issue, append: { "number": 1, "date": "2026-11-18", "title": "…", "url": "<EmailOctopus web version link>" }
+// issue, append: { "number": 1 (optional), "date": "2026-11-18", "title": "…", "url": "<EmailOctopus web version link>" }
 // ---------------------------------------------------------------------------
 
 const SECTIONS = [
@@ -97,7 +97,7 @@ const schema = {
           {past.map((i) => (
             <li>
               <a href={i.url} target="_blank" rel="noopener">
-                <span class="i-num">#{i.number}</span>
+                {i.number && <span class="i-num">#{i.number}</span>}
                 <span class="i-title">{i.title}</span>
                 <span class="i-date">{fmt(i.date)}</span>
               </a>
