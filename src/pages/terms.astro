@@ -1,0 +1,129 @@
+---
+// src/pages/terms.astro — Terms & Conditions. Plain HTML body; edit the text directly.
+// Last updated date lives in the eyebrow line below: change it when the terms change.
+import Base from "../layouts/Base.astro";
+
+const site = Astro.site?.toString().replace(/\/$/, "") || "";
+---
+<Base
+  title="Terms & Conditions — HRJobsRemote"
+  description="The terms for using HRJobsRemote.com, the weekly newsletter and paid featured job posts, including how we handle newsletter emails and privacy-friendly analytics."
+  canonical={`${site}/terms`}
+>
+  <span class="eyebrow">Last updated: 13 November 2026</span>
+  <h1>Terms &amp; Conditions</h1>
+  <div class="prose terms">
+    <p>Welcome to HRJobsRemote.com. These Terms &amp; Conditions ("Terms") explain how you can use our website, our newsletter and our paid job-posting service. By using HRJobsRemote.com, subscribing to the newsletter or buying a job post, you agree to these Terms. If you don't agree, please don't use the site.</p>
+    
+    <h2>1. Who we are</h2>
+    <p>HRJobsRemote.com (the "Site") is a job board for fully remote HR, recruiting and People roles. It has been running since 2019.</p>
+    <p>The Site, the HRJobsRemote newsletter and the related social media pages are run by <a href="https://www.linkedin.com/in/alexandrugotoi/" target="_blank" rel="noopener">Alex Goțoi</a>, based in București, Romania ("we", "us", "our").</p>
+    <p>Contact: <a href="mailto:hey@alexgotoi.com">hey@alexgotoi.com</a></p>
+    <h2>2. Who can use the Site</h2>
+    <p>You must be at least 18 years old (or the age of majority where you live) to post a job or buy any service. If you use the Site on behalf of a company, you confirm that you are allowed to accept these Terms for that company.</p>
+    <h2>3. What we do (and what we don't)</h2>
+    <p>HRJobsRemote.com is a listing service. We collect and publish remote HR job openings so job seekers can find them in one place. Listings come from three sources:</p>
+    <ul>
+    <li><strong>Company career sites.</strong> We find openings on employers' own careers pages and link to them.</li>
+    <li><strong>Partner job feeds.</strong> Some listings come from third-party job networks and aggregators.</li>
+    <li><strong>Employers.</strong> Companies and recruiters can submit jobs directly, for free or as a paid featured post.</li>
+    </ul>
+    <p>We are <strong>not</strong> an employer, recruitment agency or staffing company. We don't take part in hiring decisions, we don't screen candidates, and we don't receive or process job applications. When you click "Apply", you leave our Site and apply directly with the employer or through a third-party site. Any relationship that follows is between you and that employer.</p>
+    <h2>4. For job seekers</h2>
+    <p><strong>Using the Site is free.</strong> You don't need an account to browse or apply.</p>
+    <p><strong>Check every job yourself.</strong> We review listings and only publish roles we believe are fully remote, but we can't verify everything an employer says. Job details (salary, location restrictions, requirements, benefits) can change or be wrong. Always confirm the details with the employer before you apply or accept an offer.</p>
+    <p><strong>Jobs close.</strong> Listings are removed when the link stops working, the employer closes the role, or the listing reaches its maximum time on the Site. A job may still appear for a short time after it has been filled.</p>
+    <p><strong>Stay safe from scams.</strong> A real employer will never ask you to pay to apply, buy equipment up front, pay for training, or share bank details before a formal offer. If something looks wrong, don't proceed, and please report the listing to us at <a href="mailto:hey@alexgotoi.com">hey@alexgotoi.com</a>. We will review it and remove it if needed.</p>
+    <p><strong>No guarantee of results.</strong> We can't promise that you will get interviews, offers or a job through the Site.</p>
+    <h2>5. For employers and recruiters</h2>
+    <h3>5.1 Job posting rules</h3>
+    <p>Every job submitted to HRJobsRemote.com, free or paid, must:</p>
+    <ul>
+    <li>be a real, currently open position;</li>
+    <li>be <strong>fully remote</strong>. Hybrid roles and roles that require regular office attendance are not accepted. Occasional travel (for example, a yearly team meetup) is fine if the listing states it;</li>
+    <li>clearly state any location restrictions (for example, "US only", "EMEA time zones", specific countries);</li>
+    <li>be a role in HR, recruiting, talent acquisition, People operations or a closely related field;</li>
+    <li>be paid. We don't accept unpaid roles, commission-only roles that are not clearly labelled as such, or "pay to work" schemes;</li>
+    <li>comply with applicable law, including anti-discrimination law;</li>
+    <li>link to a working application page or email address;</li>
+    <li>not contain misleading information, multi-level marketing schemes, requests for money from candidates, or content that is offensive or unlawful.</li>
+    </ul>
+    <h3>5.2 Review and our right to refuse</h3>
+    <p>All submitted jobs are reviewed by hand before they go live. We may edit a listing for formatting, clarity, category or location tags, and we may decline or remove any listing that breaks these rules or that we believe would harm job seekers or the Site.</p>
+    <h3>5.3 Free job posts</h3>
+    <p>Free submissions are welcome but not guaranteed. We publish them at our discretion, with no fixed timeline.</p>
+    <h3>5.4 Paid featured posts</h3>
+    <p>A paid featured post includes:</p>
+    <ul>
+    <li>manual review within <strong>1 business day</strong> of payment, to confirm the role is fully remote and meets the rules above;</li>
+    <li><strong>30 days</strong> as a featured listing (highlighted on the Site), followed by <strong>30 days</strong> as a standard listing, for <strong>60 days</strong> in total;</li>
+    <li>inclusion in <strong>one</strong> weekly issue of the HRJobsRemote newsletter.</li>
+    </ul>
+    <p>We may also share featured jobs on our social media channels, but this is not guaranteed.</p>
+    <p>The price is the one shown at checkout. We don't guarantee any number of views, clicks, applications or hires.</p>
+    <h3>5.5 Payment</h3>
+    <p>Payments are processed by <strong>Stripe</strong>. We never see or store your full card details. By paying, you also agree to Stripe's terms. Invoices are available on request; please send us your company's billing details.</p>
+    <h3>5.6 Refunds</h3>
+    <ul>
+    <li><strong>If we decline your post during review, you get a full refund.</strong></li>
+    <li>If you ask us to cancel <strong>before</strong> your post goes live, you get a full refund.</li>
+    <li>Once a post is published, the service has started and <strong>the fee is non-refundable</strong>, including if you fill the role early or close it yourself.</li>
+    <li>If we remove a published post because it broke these Terms (for example, it turns out not to be remote, or it is misleading), <strong>no refund</strong> is given.</li>
+    <li>If the Site has a significant outage for reasons within our control, we will extend your listing or offer a partial refund.</li>
+    </ul>
+    <p>Paid job posts are a business service intended for companies and recruiters, not for consumers. Nothing in these Terms limits any rights you have under mandatory law.</p>
+    <h3>5.7 Your content</h3>
+    <p>You confirm that you have the right to publish the job description, company name and logo you submit. You allow us to display, format and share them on the Site, in the newsletter, on our social media channels and in job search engines (for example, via structured data) for as long as the listing is live and in past newsletter issues afterwards.</p>
+    <h3>5.8 Listings we source ourselves</h3>
+    <p>If your company's job appears on the Site because we found it on your careers page, and you want it updated or removed, email <a href="mailto:hey@alexgotoi.com">hey@alexgotoi.com</a> and we'll handle it promptly.</p>
+    <h2>6. The newsletter</h2>
+    <p><strong>What you sign up for.</strong> When you subscribe, you receive the HRJobsRemote newsletter, usually once a week, with selected remote HR jobs, and occasional sponsor messages.</p>
+    <p><strong>What we collect.</strong> We only ask for your <strong>email address</strong>. We don't ask for your name or other personal details.</p>
+    <p><strong>Who stores it.</strong> Subscriber emails are stored with our email provider, <strong>EmailOctopus</strong>, which sends the newsletter on our behalf. EmailOctopus may record whether an email is delivered, opened or clicked, so we can see how issues perform.</p>
+    <p><strong>Why.</strong> We send the newsletter because you asked for it (your consent). We never sell, rent or share your email address with employers, sponsors or other third parties.</p>
+    <p><strong>Unsubscribe anytime.</strong> Every issue has an unsubscribe link at the bottom. You can also email us and we'll remove you.</p>
+    <p><strong>Sponsors.</strong> Some issues include paid sponsor placements. Sponsored content is labelled as such. Sponsorship is booked through our storefront on Passionfroot, and sponsors receive aggregate numbers only (for example, total subscribers or clicks), never your personal data.</p>
+    <h2>7. Analytics</h2>
+    <p>We use <strong>Fathom Analytics</strong> to understand how the Site is used, for example which pages are visited and where visitors come from.</p>
+    <p>Fathom is a privacy-focused analytics tool. It <strong>does not use cookies</strong>, does not track you across other websites, and does not collect or store personal data such as your IP address in identifiable form. All the data we see is aggregated and anonymous. Because of this, we don't show a cookie banner for analytics.</p>
+    <h2>8. Affiliate and partner links</h2>
+    <p>Some job listings come from partner job networks. When you click on these listings, we may earn a small fee from the partner. This doesn't cost you anything and doesn't affect which jobs you can apply to. Paid featured posts are clearly marked as "Featured".</p>
+    <h2>9. Third-party websites</h2>
+    <p>The Site and newsletter link to employer websites, applicant tracking systems and other third-party sites. We don't control them and aren't responsible for their content, availability or privacy practices. Read their terms and privacy policies before sharing your information with them.</p>
+    <h2>10. Acceptable use</h2>
+    <p>When using the Site, you agree not to:</p>
+    <ul>
+    <li>scrape, crawl, copy or republish our job listings or data in bulk, or use them to build a competing job board, database or newsletter, without our written permission;</li>
+    <li>send automated traffic that overloads the Site or tries to bypass any limits or security measures;</li>
+    <li>submit fake, misleading or fraudulent job listings;</li>
+    <li>impersonate any person or company;</li>
+    <li>use the Site for spam, phishing or any unlawful purpose.</li>
+    </ul>
+    <p>Search engines and AI assistants that respect our robots.txt and link back to the original listing are welcome to index the Site.</p>
+    <h2>11. Intellectual property</h2>
+    <p>The HRJobsRemote.com name, logo, site design, newsletter content, articles and salary guides belong to us. You may link to and share our pages, but you may not copy substantial parts of the Site or newsletter without permission.</p>
+    <p>Job descriptions, company names and logos belong to their respective owners and are shown to help job seekers find and apply for jobs.</p>
+    <h2>12. Disclaimer</h2>
+    <p>The Site and newsletter are provided "as is" and "as available". We do our best to keep listings accurate, up to date and fully remote, but we don't guarantee that any listing is accurate, complete, still open or legitimate, or that the Site will always be available or free of errors.</p>
+    <h2>13. Limitation of liability</h2>
+    <p>To the extent permitted by law, we are not liable for:</p>
+    <ul>
+    <li>any decision you make based on a listing, or any dealings between you and an employer;</li>
+    <li>loss of income, job opportunities, data or business;</li>
+    <li>indirect or consequential losses.</li>
+    </ul>
+    <p>For paid services, our total liability to you is limited to the amount you paid us for the service in question.</p>
+    <p>Nothing in these Terms limits liability for fraud, gross negligence, wilful misconduct, or anything else that cannot be limited by law.</p>
+    <h2>14. Changes to these Terms</h2>
+    <p>We may update these Terms from time to time, for example when we add new services. The date at the top of this page shows when they last changed. Continuing to use the Site after a change means you accept the updated Terms. Changes do not apply to paid posts that are already live.</p>
+    <h2>15. Governing law</h2>
+    <p>These Terms are governed by Romanian law. Any dispute will be handled by the competent courts of București, Romania. If you are a consumer living in the EU, you also keep any protections given to you by the mandatory laws of your country of residence.</p>
+    <h2>16. Contact</h2>
+    <p>Questions about these Terms, a listing, or your data? Email <a href="mailto:hey@alexgotoi.com">hey@alexgotoi.com</a>.</p>  </div>
+
+  <style>
+    .terms h2 { margin-top: 2.2rem; }
+    .terms h3 { margin-top: 1.4rem; }
+    .terms ul { padding-left: 1.1rem; }
+  </style>
+</Base>
