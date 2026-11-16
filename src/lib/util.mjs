@@ -73,13 +73,28 @@ export const FEATURED_PLACEHOLDERS = [
   },
 ];
 
-// Listing sort: Featured pins first, then highest CPC, then newest.
+// Listing sort: Featured pins first, then NEWEST (by day), then highest CPC within the same day.
+const day = (d) => String(d || "").slice(0, 10);
 export const sortJobs = (jobs) =>
   [...jobs].sort((a, b) =>
     (b.featured === true) - (a.featured === true) ||
-    (Number(b.cpc) || 0) - (Number(a.cpc) || 0) ||
-    new Date(b.datePosted || 0) - new Date(a.datePosted || 0)
+    day(b.datePosted).localeCompare(day(a.datePosted)) ||
+    (Number(b.cpc) || 0) - (Number(a.cpc) || 0)
   );
+
+// Same job posted more than once (e.g. careers + feed): one per normalized title + company.
+// MUST match feed-sync lib/enrich.mjs normTitle/normCompany.
+const REMOTE_WORDS = /\b(fully remote|100% remote|remote[- ]first|remote[- ]eligible|remote|work from home|work-from-home|wfh|home[- ]based|telework(?: eligible)?)\b/g;
+export const dupKey = (j) =>
+  (j.title || "").toLowerCase().replace(REMOTE_WORDS, " ").replace(/\(\s*\)/g, " ").replace(/[^a-z0-9&+#]+/g, " ").trim() + "|" +
+  (j.company || "").toLowerCase().replace(/\b(inc|llc|ltd|corp|corporation|co|company|lp|llp|plc|gmbh)\b\.?/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Map dupKey → the job that represents the group (featured, newest, then CPC). */
+export const primaryByKey = (jobs) => {
+  const m = new Map();
+  for (const j of sortJobs(jobs)) if (!m.has(dupKey(j))) m.set(dupKey(j), j);
+  return m;
+};
 
 // The 16 canonical HR categories — MUST match feed-sync/config.mjs HR_CATEGORIES.
 // Drives the footer + generates a landing page for every category (even empty ones),
