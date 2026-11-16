@@ -3,6 +3,7 @@
 import { getJobs, getArticles } from "../lib/airtable.mjs";
 import { buildLandingPages, buildCompanyPages } from "../lib/landing.mjs";
 import { buildCollections } from "../lib/collections.mjs";
+import { primaryByKey } from "../lib/util.mjs";
 
 export async function GET({ site }) {
   const base = site.toString().replace(/\/$/, "");
@@ -24,10 +25,11 @@ export async function GET({ site }) {
     { loc: `${base}/about` },
     { loc: `${base}/salary-guides` },
     { loc: `${base}/collections` },
-    ...landing.map((p) => ({ loc: `${base}/${p.slug}`, lastmod: p.lastmod || undefined })),
+    ...landing.filter((p) => !p.empty).map((p) => ({ loc: `${base}/${p.slug}`, lastmod: p.lastmod || undefined })),
     ...companies.map((c) => ({ loc: `${base}/companies/${c.slug}`, lastmod: c.lastmod || undefined })),
     ...collections.map((c) => ({ loc: `${base}/collections/${c.slug}`, lastmod: c.lastmod || undefined })),
-    ...open.map((j) => ({ loc: `${base}/jobs/${j.slug}`, lastmod: j.datePosted })),
+    // One URL per duplicate group (the canonical copy); empty categories are noindex.
+    ...[...primaryByKey(open).values()].map((j) => ({ loc: `${base}/jobs/${j.slug}`, lastmod: String(j.datePosted || "").slice(0, 10) || undefined })),
     ...articles.map((a) => ({ loc: `${base}/blog/${a.slug}`, lastmod: a.dateModified })),
   ];
 

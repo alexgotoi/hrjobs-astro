@@ -54,7 +54,7 @@ const otherCats = isEmpty
 // so the Q&A content stays unique per page rather than duplicated across many combos.
 const faqItems = page.kind === "category" && !isEmpty ? categoryFaq(page.cat) : [];
 ---
-<Base title={page.title} description={metaDesc} canonical={url} schemas={[itemList, breadcrumbSchema(crumbs), faqSchema(faqItems)].filter(Boolean)} wide={true}>
+<Base title={page.title} description={metaDesc} canonical={url} noindex={isEmpty} schemas={[itemList, breadcrumbSchema(crumbs), faqSchema(faqItems)].filter(Boolean)} wide={true}>
   <span class="eyebrow">{page.eyebrow}</span>
   <h1>{page.h1}</h1>
   {isEmpty && <p class="answer">{page.intro}</p>}

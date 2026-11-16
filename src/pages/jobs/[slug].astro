@@ -5,20 +5,25 @@ import JobBoard from "../../components/JobBoard.astro";
 import CompanyLogo from "../../components/CompanyLogo.astro";
 import { getJobs } from "../../lib/airtable.mjs";
 import { jobPostingSchema, breadcrumbSchema } from "../../lib/schema.mjs";
-import { catSlug, companySlug, sortJobs, applyHref } from "../../lib/util.mjs";
+import { catSlug, companySlug, sortJobs, applyHref, dupKey, primaryByKey } from "../../lib/util.mjs";
 
 export async function getStaticPaths() {
-  const jobs = await getJobs(); // open + closed (closed stays indexable)
+  const jobs = await getJobs(); // open + closed (closed pages stay up for visitors, noindex)
   const open = jobs.filter((j) => !j.closed);
+  const primary = primaryByKey(open);
   return jobs.map((job) => {
     const related = sortJobs(open.filter((j) => j.hrCategory === job.hrCategory && j.slug !== job.slug)).slice(0, 8);
-    return { params: { slug: job.slug }, props: { job, related } };
+    // A duplicate open job points its canonical at the copy that represents the group.
+    const p = !job.closed && primary.get(dupKey(job));
+    const canonicalSlug = p && p.slug !== job.slug ? p.slug : job.slug;
+    return { params: { slug: job.slug }, props: { job, related, canonicalSlug } };
   });
 }
 
-const { job, related } = Astro.props;
+const { job, related, canonicalSlug } = Astro.props;
 const site = Astro.site?.toString().replace(/\/$/, "") || "";
 const jobUrl = `${site}/jobs/${job.slug}`;
+const canonicalUrl = `${site}/jobs/${canonicalSlug || job.slug}`;
 
 const empMap = { FULL_TIME: "Full-time", PART_TIME: "Part-time", CONTRACTOR: "Contract", INTERN: "Internship" };
 const emp = empMap[job.employmentType] || "Full-time";
@@ -57,9 +62,11 @@ const crumbs = [
   { name: job.title, url: jobUrl },
 ];
 
-const schemas = [jobPostingSchema(job, jobUrl), breadcrumbSchema(crumbs)];
+// Closed jobs: no JobPosting markup and noindex (Google treats indexed expired job
+// pages as soft 404s). The page stays up so old links still land on related jobs.
+const schemas = job.closed ? [breadcrumbSchema(crumbs)] : [jobPostingSchema(job, jobUrl), breadcrumbSchema(crumbs)];
 ---
-<Base title={title} description={metaDesc} canonical={jobUrl} schemas={schemas} ogType="article" wide={true}>
+<Base title={title} description={metaDesc} canonical={canonicalUrl} noindex={job.closed} schemas={schemas} ogType="article" wide={true}>
   <header class="job-header">
     <CompanyLogo company={job.company} logo={job.companyLogo} size={64} />
     <div>
