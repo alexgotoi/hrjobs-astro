@@ -170,6 +170,15 @@ const NEWSLETTER_URL = "/newsletter";
         window.addEventListener("resize", set);
       })();
 
+      // Fathom custom events: any element with a data-fathom attribute fires
+      // fathom.trackEvent(<its value>) when clicked. Capture phase + sendBeacon
+      // inside Fathom means the event still registers when the link navigates or
+      // opens a new tab. No-ops safely if the Fathom script hasn't loaded.
+      document.addEventListener("click", function (e) {
+        var t = e.target.closest("[data-fathom]");
+        if (t && window.fathom) window.fathom.trackEvent(t.getAttribute("data-fathom"));
+      }, true);
+
       // Newsletter band: submit in place (no page change) and confirm under the form.
       // Without JS the form still posts normally and lands on /subscribed.
       document.querySelectorAll(".nl-form").forEach(function (form, i) {
@@ -186,7 +195,10 @@ const NEWSLETTER_URL = "/newsletter";
             .then(function (r) { return r.json(); })
             .then(function (d) {
               show(d.message, d.ok ? "ok" : "error");
-              if (d.ok) form.reset();
+              if (d.ok) {
+                form.reset();
+                if (window.fathom) window.fathom.trackEvent("Newsletter signup");
+              }
             })
             .catch(function () { show("Something went wrong. Please try again.", "error"); })
             .finally(function () { btn.disabled = false; });

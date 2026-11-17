@@ -160,7 +160,8 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
             <p class="jb-title"><a class="jb-link"
               href={applyHref(j, "board_card") || `/jobs/${j.slug}`}
               target={j.applyUrl ? "_blank" : undefined}
-              rel={j.applyUrl ? "nofollow noopener" : undefined}>{j.title}</a></p>
+              rel={j.applyUrl ? "nofollow noopener" : undefined}
+              data-fathom={j.applyUrl ? "Apply click" : undefined}>{j.title}</a></p>
             <p class="jb-company">{j.company}</p>
             <div class="jb-tags">
               {j.featured && <span class="tag feat">★ Featured</span>}
