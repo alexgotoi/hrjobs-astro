@@ -176,7 +176,11 @@ const NEWSLETTER_URL = "/newsletter";
       // opens a new tab. No-ops safely if the Fathom script hasn't loaded.
       document.addEventListener("click", function (e) {
         var t = e.target.closest("[data-fathom]");
-        if (t && window.fathom) window.fathom.trackEvent(t.getAttribute("data-fathom"));
+        if (!t || !window.fathom) return;
+        window.fathom.trackEvent(t.getAttribute("data-fathom"));
+        // Optional per-item event (e.g. the specific job) fired alongside the rollup.
+        var detail = t.getAttribute("data-fathom-detail");
+        if (detail) window.fathom.trackEvent(detail);
       }, true);
 
       // Newsletter band: submit in place (no page change) and confirm under the form.

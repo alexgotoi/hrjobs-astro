@@ -153,6 +153,16 @@ export function applyHref(job, placement) {
   });
 }
 
+/** Fathom event name for an Apply click, carrying the job's identity so each job
+ *  gets its own count in the dashboard. This is only an analytics label — it is
+ *  never added to the outbound apply URL, so feed links (whatjobs/joblookup) stay
+ *  exactly as provided. Same name from every placement, so a job's clicks aggregate. */
+export function applyEvent(job) {
+  const title = String(job.title || "Job").replace(/\s+/g, " ").trim();
+  const company = String(job.company || "").replace(/\s+/g, " ").trim();
+  return `Apply: ${company ? `${title} – ${company}` : title}`.slice(0, 120);
+}
+
 /** Link to excelforhr.com, tagged with where on the site it sits. */
 export const excelLink = (placement) =>
   withUtm("https://excelforhr.com/", {
