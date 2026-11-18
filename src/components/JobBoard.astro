@@ -1,6 +1,6 @@
 ---
 import CompanyLogo from "./CompanyLogo.astro";
-import { applyHref } from "../lib/util.mjs";
+import { applyHref, applyEvent } from "../lib/util.mjs";
 // src/components/JobBoard.astro — Remotive-style listing with client-side
 // filtering (search + category pills + fully-remote toggle + type/level/region
 // dropdowns) and a live job count. Each card links to its dedicated /jobs/[slug]
@@ -161,7 +161,8 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
               href={applyHref(j, "board_card") || `/jobs/${j.slug}`}
               target={j.applyUrl ? "_blank" : undefined}
               rel={j.applyUrl ? "nofollow noopener" : undefined}
-              data-fathom={j.applyUrl ? "Apply click" : undefined}>{j.title}</a></p>
+              data-fathom={j.applyUrl ? "Apply click" : undefined}
+              data-fathom-detail={j.applyUrl ? applyEvent(j) : undefined}>{j.title}</a></p>
             <p class="jb-company">{j.company}</p>
             <div class="jb-tags">
               {j.featured && <span class="tag feat">★ Featured</span>}
