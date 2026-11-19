@@ -73,11 +73,24 @@ export const FEATURED_PLACEHOLDERS = [
   },
 ];
 
-// Listing sort: Featured pins first, then NEWEST (by day), then highest CPC within the same day.
+// Listing sort (Nov 2026):
+//   1. Featured (paid pins)
+//   2. Boosted — a CPC Override is set in Airtable (highest override first)
+//   3. Top tier — CPC >= CPC_TOP_TIER, plus our own careers/manual jobs
+//   4. Everything else
+// Inside each group: newest Date Posted (by day) first, then highest CPC.
+export const CPC_TOP_TIER = 0.2;
+const OWN_SOURCES = new Set(["careers", "manual"]);
 const day = (d) => String(d || "").slice(0, 10);
+const group = (j) =>
+  j.featured === true ? 0
+  : j.boosted ? 1
+  : (Number(j.cpc) || 0) >= CPC_TOP_TIER || OWN_SOURCES.has(j.source) ? 2
+  : 3;
 export const sortJobs = (jobs) =>
   [...jobs].sort((a, b) =>
-    (b.featured === true) - (a.featured === true) ||
+    group(a) - group(b) ||
+    (group(a) === 1 ? (Number(b.cpc) || 0) - (Number(a.cpc) || 0) : 0) ||
     day(b.datePosted).localeCompare(day(a.datePosted)) ||
     (Number(b.cpc) || 0) - (Number(a.cpc) || 0)
   );

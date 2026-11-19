@@ -65,7 +65,7 @@ const BASE = import.meta.env.AIRTABLE_BASE_ID || process.env.AIRTABLE_BASE_ID;
 const JOB_FIELDS = [
   "Source ID", "Source", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
   "Company Logo", "City", "State", "Country", "HR Category", "Career Level",
-  "Remote Type", "Remote Region", "Employment Type", "CPC", "Featured",
+  "Remote Type", "Remote Region", "Employment Type", "CPC", "CPC Override", "Featured",
   "Featured Until", "Date Posted", "Closed Date",
 ];
 const BLOG_FIELDS = [
@@ -158,7 +158,10 @@ function normalizeJob(j) {
     remoteType: j["Remote Type"] || (j.Remote ? "Fully Remote" : "On-site"),
     remoteRegion: j["Remote Region"] || "",
     employmentType: j["Employment Type"] || "FULL_TIME",
-    cpc: Number(j["CPC"]) || 0,
+    // CPC Override (set by hand in Airtable, never touched by the sync) wins over the feed CPC
+    // and pins the job right below Featured jobs.
+    cpc: Number(j["CPC Override"]) || Number(j["CPC"]) || 0,
+    boosted: Number(j["CPC Override"]) > 0,
     featured: isFeatured(j), // ticked AND within the paid Featured-Until window
     datePosted: j["Date Posted"] || "",
     closedDate: j["Closed Date"] || "",
