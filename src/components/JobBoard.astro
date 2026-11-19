@@ -41,9 +41,9 @@ const relDate = (d) => {
   if (!d) return "";
   const days = Math.floor((Date.now() - new Date(d)) / 86400000);
   if (days <= 1) return "New";
-  if (days < 7) return `${days}d ago`;
-  if (days < 28) return `${Math.floor(days / 7)}w ago`;
-  return `${Math.floor(days / 30)}mo ago`;
+  if (days <= 7) return `${days}d ago`;                      // 2d … 7d
+  if (days < 60) return `${Math.floor(days / 7)}w ago`;      // 1w … 8w
+  return `${Math.floor(days / 30)}mo ago`;                   // 2mo+ (never "0mo")
 };
 
 const counts = {};
