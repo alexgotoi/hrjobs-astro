@@ -140,7 +140,7 @@ const regionOpts = [...new Set(jobs.map((j) => j.remoteRegion).filter(Boolean))]
   <ul class="jb-list">
     {jobs.map((j) => {
       const emp = empLabel[j.employmentType] || "Full-time";
-      const rel = relDate(j.datePosted);
+      const rel = relDate(j.added || j.datePosted);
       return (
         <li class={`jb-row${j.featured ? " featured" : ""}`}
             data-job

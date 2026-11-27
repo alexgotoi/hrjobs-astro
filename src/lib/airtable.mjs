@@ -35,7 +35,9 @@
  * @property {string}  employmentType FULL_TIME | PART_TIME.
  * @property {number}  cpc            Cost-per-click from the feed — hidden sort key (never displayed).
  * @property {boolean} featured       Manual pin: sorts above the CPC order (for sponsored placements).
- * @property {string}  datePosted     ISO date (YYYY-MM-DD).
+ * @property {string}  datePosted     ISO date (YYYY-MM-DD) — the employer's posting date (job page + JobPosting schema).
+ * @property {string}  added          ISO datetime the job was added to our Airtable ("Added" created-time field)
+ *                                    — drives "New / Nd ago", listing order and the "newest" collection.
  * @property {string}  closedDate     ISO date a job was closed (drives validThrough on closed pages).
  *
  * @typedef {Object} Article
@@ -66,7 +68,7 @@ const JOB_FIELDS = [
   "Source ID", "Source", "Status", "Title", "Slug", "Description", "Apply URL", "Company",
   "Company Logo", "City", "State", "Country", "HR Category", "Career Level",
   "Remote Type", "Remote Region", "Employment Type", "CPC", "CPC Override", "Featured",
-  "Featured Until", "Date Posted", "Closed Date",
+  "Featured Until", "Date Posted", "Added", "Closed Date",
 ];
 const BLOG_FIELDS = [
   "Title", "Slug", "Summary", "Body", "Author", "Category",
@@ -164,6 +166,7 @@ function normalizeJob(j) {
     boosted: Number(j["CPC Override"]) > 0,
     featured: isFeatured(j), // ticked AND within the paid Featured-Until window
     datePosted: j["Date Posted"] || "",
+    added: j.Added || j["Date Posted"] || "",
     closedDate: j["Closed Date"] || "",
   };
 }
