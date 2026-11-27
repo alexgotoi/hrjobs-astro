@@ -69,8 +69,8 @@ export const COLLECTIONS = [
   {
     slug: "newest-remote-hr-jobs",
     title: "Newest Remote HR Jobs This Week",
-    blurb: "The freshest remote HR roles — every job here was posted in the last seven days.",
-    match: (j) => withinDays(j.datePosted, 7),
+    blurb: "The freshest remote HR roles — every job here was added in the last seven days.",
+    match: (j) => withinDays(j.added || j.datePosted, 7),
   },
 ];
 

@@ -78,7 +78,7 @@ export const FEATURED_PLACEHOLDERS = [
 //   2. Boosted — a CPC Override is set in Airtable (highest override first)
 //   3. Top tier — CPC >= CPC_TOP_TIER, plus our own careers/manual jobs
 //   4. Everything else
-// Inside each group: newest Date Posted (by day) first, then highest CPC.
+// Inside each group: newest Added date (when the job reached our site, by day) first, then highest CPC.
 export const CPC_TOP_TIER = 0.2;
 const OWN_SOURCES = new Set(["careers", "manual"]);
 const day = (d) => String(d || "").slice(0, 10);
@@ -91,7 +91,7 @@ export const sortJobs = (jobs) =>
   [...jobs].sort((a, b) =>
     group(a) - group(b) ||
     (group(a) === 1 ? (Number(b.cpc) || 0) - (Number(a.cpc) || 0) : 0) ||
-    day(b.datePosted).localeCompare(day(a.datePosted)) ||
+    day(b.added || b.datePosted).localeCompare(day(a.added || a.datePosted)) ||
     (Number(b.cpc) || 0) - (Number(a.cpc) || 0)
   );
 
